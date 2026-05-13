@@ -18,7 +18,6 @@
         }
         body { font-family: 'Tajawal', sans-serif; background-color: var(--gray-100); margin: 0; padding: 0; color: var(--gray-800); line-height: 1.5; }
 
-        /* ================= شاشة تسجيل الدخول ================= */
         #login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #4f46e5 0%, #1f2937 100%); padding: 20px;}
         .login-card { background: white; padding: 40px; border-radius: 16px; width: 100%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); text-align: center; }
         .login-logo { font-size: 50px; margin-bottom: 10px; color: var(--warning); }
@@ -31,7 +30,6 @@
         .login-error { color: var(--danger); font-size: 13px; font-weight: 700; margin-top: 15px; display: none; }
         .login-hint { margin-top: 20px; font-size: 11px; color: var(--gray-600); text-align: right; background: var(--gray-50); padding: 10px; border-radius: 8px; }
 
-        /* ================= لوحة التحكم الرئيسية ================= */
         #app-container { display: none; max-width: 1440px; margin: auto; background: white; padding: 24px; border-radius: 16px; box-shadow: var(--shadow-lg); position: relative; }
         .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid var(--gray-200); padding-bottom: 10px; flex-wrap: wrap; gap: 10px; }
         .app-brand { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 800; color: var(--primary); }
@@ -51,7 +49,7 @@
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
         
-        .table-container { border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; margin-bottom: 24px; box-shadow: var(--shadow-sm); }
+        .table-container { border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: auto; max-height: 75vh; margin-bottom: 24px; box-shadow: var(--shadow-sm); }
         table { width: 100%; border-collapse: collapse; font-size: 12px; }
         th, td { padding: 8px 10px; text-align: center; border-bottom: 1px solid var(--gray-100); }
         th { background-color: var(--gray-800); color: white; font-weight: 600; position: sticky; top: 0; z-index: 10; }
@@ -61,17 +59,15 @@
         input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); background: white; }
         .input-actual { background-color: var(--success-light) !important; font-weight: 600; }
         .input-forecast { background-color: var(--purple-light) !important; font-weight: 600; color: var(--purple); }
-        .input-hist { background-color: transparent !important; } /* جعل خلفية الإدخال التاريخي شفافة لتبقى ألوان الصفوف ظاهرة */
+        .input-hist { background-color: transparent !important; }
         .input-total { background-color: var(--gray-100) !important; font-weight: 800; color: var(--gray-800); }
         input:disabled, select:disabled, button:disabled { opacity: 0.5; cursor: not-allowed !important; transform: none !important; box-shadow: none !important; background-color: var(--gray-100) !important; color: var(--gray-600) !important; border-color: transparent !important; }
         
-        /* تحسين ألوان الصفوف لتكون واضحة في التمرير */
         tr.row-rev { background-color: #eff6ff; } 
         tr.row-cogs { background-color: #fff1f2; } 
         tr.row-opex { background-color: var(--warning-light); } 
         tr.row-admin { background-color: #f0f9ff; }
         tr.row-title { background-color: var(--gray-200); font-weight: 800; }
-
         .row-profit { background-color: var(--success-light); font-weight: bold; border-top: 2px solid var(--success); }
         .row-total { background-color: var(--gray-100); font-weight: bold; border-top: 2px solid var(--gray-300); } .bold-text { font-weight: 800; }
         .tag { font-size: 9px; padding: 2px 6px; border-radius: 12px; color: white; margin-left: 5px; display: inline-block; font-weight: 700; }
@@ -98,19 +94,22 @@
         .weight-group input[type="number"] { width: 70px; font-size: 18px; font-weight: 800; border: 1px solid var(--gray-300); border-radius: 6px; }
         .actual-weights { font-size: 11px; color: var(--primary); margin-top: 6px; font-weight: 700; }
         
-        /* ================= تحسين جدول البيانات التاريخية (Sticky Columns) ================= */
-        .hist-table-container { overflow: auto; max-height: 70vh; border: 1px solid var(--gray-200); border-radius: var(--radius); margin-bottom: 24px; box-shadow: var(--shadow-sm); }
-        .hist-table-container table { width: max-content; min-width: 100%; } /* السماح بالتمدد الأفقي */
-        
-        /* تثبيت الأعمدة الثلاثة الأولى (الإجراء، البيان، السنة) */
-        .hist-sticky-1 { position: sticky; right: 0; z-index: 12; min-width: 70px; background-color: inherit; border-left: 2px solid var(--gray-200); }
-        .hist-sticky-2 { position: sticky; right: 70px; z-index: 12; min-width: 180px; background-color: inherit; text-align: right !important; font-weight: 600; border-left: 2px solid var(--gray-200); }
-        .hist-sticky-3 { position: sticky; right: 250px; z-index: 12; min-width: 60px; background-color: inherit; font-weight: 700; border-left: 2px solid var(--gray-200); }
-        
-        /* تثبيت الرأس للأعمدة الثابتة */
-        th.hist-sticky-1 { background: var(--gray-800); right: 0; z-index: 15; }
-        th.hist-sticky-2 { background: var(--gray-800); right: 70px; z-index: 15; }
-        th.hist-sticky-3 { background: var(--gray-800); right: 250px; z-index: 15; }
+        /* ================= تحسين الجداول الثابتة (Sticky) لجميع الشاشات ================= */
+        /* شاشة التنبؤ */
+        .forecast-sticky-name { position: sticky; right: 0; z-index: 5; min-width: 200px; text-align: right; font-weight: 600; background-color: inherit; border-left: 2px solid var(--gray-200); box-shadow: -3px 0 5px rgba(0,0,0,0.05); }
+        .forecast-sticky-total { position: sticky; left: 0; z-index: 5; background-color: inherit; border-right: 2px solid var(--gray-200); box-shadow: 3px 0 5px rgba(0,0,0,0.05); }
+        th.forecast-sticky-name { background: var(--gray-800); z-index: 15; color: white; border-left: none; box-shadow: none; }
+        th.forecast-sticky-total { background: var(--gray-600); z-index: 15; color: white; border-right: none; box-shadow: none; }
+
+        /* شاشة التاريخ */
+        .hist-sticky-1 { position: sticky; right: 0; z-index: 12; min-width: 70px; background-color: inherit; border-left: 2px solid var(--gray-200); box-shadow: -3px 0 5px rgba(0,0,0,0.05); }
+        .hist-sticky-2 { position: sticky; right: 70px; z-index: 12; min-width: 180px; background-color: inherit; text-align: right !important; font-weight: 600; border-left: 2px solid var(--gray-200); box-shadow: -3px 0 5px rgba(0,0,0,0.05); }
+        .hist-sticky-3 { position: sticky; right: 250px; z-index: 12; min-width: 60px; background-color: inherit; font-weight: 700; border-left: 2px solid var(--gray-200); box-shadow: -3px 0 5px rgba(0,0,0,0.05); }
+        th.hist-sticky-1, th.hist-sticky-2, th.hist-sticky-3 { background: var(--gray-800); z-index: 15; box-shadow: none; }
+
+        /* شاشة المقارنة */
+        .comp-sticky-name { position: sticky; right: 0; z-index: 5; min-width: 150px; text-align: right; font-weight: 600; background-color: inherit; border-left: 2px solid var(--gray-200); box-shadow: -3px 0 5px rgba(0,0,0,0.05); }
+        th.comp-sticky-name { background: var(--gray-800); z-index: 15; color: white; border-left: none; box-shadow: none; }
 
         .charts-container { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
         @media (max-width: 900px) { .charts-container { grid-template-columns: 1fr; } }
@@ -157,6 +156,7 @@
         <button class="tab-btn" onclick="window.switchTab('tab4', this)">📈 التحليل والنسب</button>
     </div>
 
+    <!-- شاشة التنبؤ -->
     <div id="tab1" class="tab-content active">
         <div class="weights-panel" id="weights-panel-ui">
             <h3>⚖️ أوزان خوارزمية التنبؤ</h3>
@@ -170,12 +170,12 @@
             <div class="summary-box gross-box"><label>مجمل الربح 2026</label><span id="sumGross">0</span></div>
             <div class="summary-box net-box"><label>صافي الربح 2026</label><span id="sumNet">0</span></div>
         </div>
-        <div class="table-container" style="overflow-x: auto; max-height: 70vh;">
-            <table><thead><tr><th rowspan="2" style="width: 200px; position: sticky; left:0; z-index:11; background: var(--gray-800);">البيان</th><th colspan="4" class="header-actual">الفعلي 2026</th><th colspan="8" class="header-forecast">التنبؤ 2026</th><th rowspan="2" style="background: var(--gray-600);">إجمالي 2026</th></tr><tr><th class="header-actual">يناير</th><th class="header-actual">فبراير</th><th class="header-actual">مارس</th><th class="header-actual">أبريل</th><th class="header-forecast">مايو</th><th class="header-forecast">يونيو</th><th class="header-forecast">يوليو</th><th class="header-forecast">أغسطس</th><th class="header-forecast">سبتمبر</th><th class="header-forecast">أكتوبر</th><th class="header-forecast">نوفمبر</th><th class="header-forecast">ديسمبر</th></tr></thead><tbody id="forecastBody"></tbody></table>
+        <div class="table-container">
+            <table><thead><tr><th class="forecast-sticky-name">البيان</th><th colspan="4" class="header-actual">الفعلي 2026</th><th colspan="8" class="header-forecast">التنبؤ 2026</th><th class="forecast-sticky-total">إجمالي 2026</th></tr><tr><th class="forecast-sticky-name">الشهر</th><th class="header-actual">يناير</th><th class="header-actual">فبراير</th><th class="header-actual">مارس</th><th class="header-actual">أبريل</th><th class="header-forecast">مايو</th><th class="header-forecast">يونيو</th><th class="header-forecast">يوليو</th><th class="header-forecast">أغسطس</th><th class="header-forecast">سبتمبر</th><th class="header-forecast">أكتوبر</th><th class="header-forecast">نوفمبر</th><th class="header-forecast">ديسمبر</th><th class="forecast-sticky-total">الإجمالي</th></tr></thead><tbody id="forecastBody"></tbody></table>
         </div>
     </div>
 
-    <!-- شاشة البيانات التاريخية المحدثة -->
+    <!-- شاشة التاريخ -->
     <div id="tab2" class="tab-content">
         <h2>البيانات التاريخية الفعلية (2024 - 2025)</h2>
         <div class="add-form" id="add-form-ui">
@@ -185,26 +185,17 @@
             <select id="newType" style="border:1px solid var(--gray-300); width:120px;"><option value="seasonal">موسمي</option><option value="fixed">ثابت</option></select>
             <button class="btn btn-add" onclick="window.addItem()">+ إضافة وحفظ</button>
         </div>
-        <div class="hist-table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th class="hist-sticky-1">إجراء</th>
-                        <th class="hist-sticky-2">البيان</th>
-                        <th class="hist-sticky-3">السنة</th>
-                        <th>يناير</th><th>فبراير</th><th>مارس</th><th>أبريل</th><th>مايو</th><th>يونيو</th>
-                        <th>يوليو</th><th>أغسطس</th><th>سبتمبر</th><th>أكتوبر</th><th>نوفمبر</th><th>ديسمبر</th>
-                        <th style="background:var(--gray-600)">الإجمالي</th>
-                    </tr>
-                </thead>
-                <tbody id="histBody"></tbody>
-            </table>
+        <div class="table-container">
+            <table><thead><tr><th class="hist-sticky-1">إجراء</th><th class="hist-sticky-2">البيان</th><th class="hist-sticky-3">السنة</th><th>يناير</th><th>فبراير</th><th>مارس</th><th>أبريل</th><th>مايو</th><th>يونيو</th><th>يوليو</th><th>أغسطس</th><th>سبتمبر</th><th>أكتوبر</th><th>نوفمبر</th><th>ديسمبر</th><th style="background:var(--gray-600)">الإجمالي</th></tr></thead><tbody id="histBody"></tbody></table>
         </div>
     </div>
 
+    <!-- شاشة المقارنة -->
     <div id="tab3" class="tab-content">
         <h2>المقارنة السنوية ونسب التغير</h2>
-        <div class="table-container" style="overflow-x: auto;"><table><thead><tr><th>البيان</th><th>2024</th><th>2025</th><th>2026</th><th>التغير 24←25</th><th>التغير 25←26</th></tr></thead><tbody id="compBody"></tbody></table></div>
+        <div class="table-container">
+            <table><thead><tr><th class="comp-sticky-name">البيان</th><th>2024</th><th>2025</th><th>2026</th><th>التغير 24←25</th><th>التغير 25←26</th></tr></thead><tbody id="compBody"></tbody></table>
+        </div>
     </div>
 
     <div id="tab4" class="tab-content">
@@ -223,13 +214,9 @@
   import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
   const firebaseConfig = {
-    apiKey: "AIzaSyDyGVZKjpxWdqnE3brj5l3OjjOAPhYn8x0",
-    authDomain: "financial-forcast-95786.firebaseapp.com",
-    projectId: "financial-forcast-95786",
-    storageBucket: "financial-forcast-95786.firebasestorage.app",
-    messagingSenderId: "180041737366",
-    appId: "1:180041737366:web:f11403e2d693c95b674eb7",
-    measurementId: "G-297ZBLW19K"
+    apiKey: "AIzaSyDyGVZKjpxWdqnE3brj5l3OjjOAPhYn8x0", authDomain: "financial-forcast-95786.firebaseapp.com",
+    projectId: "financial-forcast-95786", storageBucket: "financial-forcast-95786.firebasestorage.app",
+    messagingSenderId: "180041737366", appId: "1:180041737366:web:f11403e2d693c95b674eb7", measurementId: "G-297ZBLW19K"
   };
 
   const app = initializeApp(firebaseConfig);
@@ -269,110 +256,75 @@
       try {
           await set(ref(db, 'accounts'), accounts);
           document.getElementById('sync-status').innerText = '☁️ تم الحفظ (متصل)';
-      } catch (error) {
-          console.error("Firebase save error:", error);
-          document.getElementById('sync-status').innerText = '❌ خطأ في الحفظ';
-      }
+      } catch (error) { console.error("Firebase save error:", error); document.getElementById('sync-status').innerText = '❌ خطأ في الحفظ'; }
   }
 
   function debouncedSave() { clearTimeout(saveTimeout); saveTimeout = setTimeout(() => saveDataToFirebase(), 1500); }
 
   const systemUsers = { admin: { password: '1234', role: 'admin', name: 'مدير النظام' }, viewer: { password: '0000', role: 'viewer', name: 'مستخدم للعرض فقط' } };
   window.handleLogin = function() {
-      const u = document.getElementById('username').value;
-      const p = document.getElementById('password').value;
+      const u = document.getElementById('username').value; const p = document.getElementById('password').value;
       if (systemUsers[u] && systemUsers[u].password === p) {
-          currentUser = systemUsers[u];
-          document.getElementById('login-screen').style.display = 'none';
-          document.getElementById('app-container').style.display = 'block';
-          document.getElementById('user-badge').innerText = `👤 ${currentUser.name}`;
-          loadDataFromFirebase();
+          currentUser = systemUsers[u]; document.getElementById('login-screen').style.display = 'none'; document.getElementById('app-container').style.display = 'block';
+          document.getElementById('user-badge').innerText = `👤 ${currentUser.name}`; loadDataFromFirebase();
       } else { document.getElementById('login-error').style.display = 'block'; }
   }
   window.handleLogout = function() {
       currentUser = null; accounts = JSON.parse(JSON.stringify(defaultAccounts));
-      document.getElementById('app-container').style.display = 'none';
-      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('app-container').style.display = 'none'; document.getElementById('login-screen').style.display = 'flex';
       document.getElementById('username').value = ''; document.getElementById('password').value = '';
   }
   function applyPermissions() {
       const isViewer = currentUser?.role === 'viewer';
-      setTimeout(() => {
-          if (isViewer) {
-              document.querySelectorAll('input[type="number"]').forEach(input => input.disabled = true);
-              document.querySelectorAll('select').forEach(sel => sel.disabled = true);
-              document.querySelectorAll('.btn-add, .btn-delete, .btn-update, .btn-apply').forEach(btn => btn.disabled = true);
-          }
-      }, 100);
+      setTimeout(() => { if (isViewer) { document.querySelectorAll('input[type="number"]').forEach(input => input.disabled = true); document.querySelectorAll('select').forEach(sel => sel.disabled = true); document.querySelectorAll('.btn-add, .btn-delete, .btn-update, .btn-apply').forEach(btn => btn.disabled = true); } }, 100);
   }
 
   function ensembleForecast(historicalArray, targetMonthIndex) {
-      let Y = historicalArray.filter(v => v !== null && v !== 0);
-      if(Y.length < 3) return Math.round(Y.length > 0 ? Y[Y.length-1] : 0);
+      let Y = historicalArray.filter(v => v !== null && v !== 0); if(Y.length < 3) return Math.round(Y.length > 0 ? Y[Y.length-1] : 0);
       let N = Y.length, X = Array.from({length: N}, (_, i) => i + 1);
-      let sumX = X.reduce((a,b)=>a+b,0), sumY = Y.reduce((a,b)=>a+b,0);
-      let sumXY = X.reduce((a,b,i)=>a+b*Y[i],0), sumX2 = X.reduce((a,b)=>a+b*b,0);
-      let b = (N * sumXY - sumX * sumY) / (N * sumX2 - sumX * sumX);
-      let a = (sumY - b * sumX) / N;
-      let lrForecast = a + b * (N + targetMonthIndex + 1);
-      let maForecast = Y.slice(-3).reduce((a,b)=>a+b,0) / 3;
-      let m1 = historicalArray[targetMonthIndex] || sumY/N; 
-      let m2 = historicalArray[targetMonthIndex + 12] || sumY/N; 
-      let seasonalIndex = ((m1 + m2) / 2) / (sumY / 24);
-      let seasonalForecast = lrForecast * seasonalIndex;
+      let sumX = X.reduce((a,b)=>a+b,0), sumY = Y.reduce((a,b)=>a+b,0), sumXY = X.reduce((a,b,i)=>a+b*Y[i],0), sumX2 = X.reduce((a,b)=>a+b*b,0);
+      let b = (N * sumXY - sumX * sumY) / (N * sumX2 - sumX * sumX); let a = (sumY - b * sumX) / N;
+      let lrForecast = a + b * (N + targetMonthIndex + 1); let maForecast = Y.slice(-3).reduce((a,b)=>a+b,0) / 3;
+      let m1 = historicalArray[targetMonthIndex] || sumY/N; let m2 = historicalArray[targetMonthIndex + 12] || sumY/N; 
+      let seasonalIndex = ((m1 + m2) / 2) / (sumY / 24); let seasonalForecast = lrForecast * seasonalIndex;
       return Math.round((W_MA * maForecast) + (W_LR * lrForecast) + (W_SEASONAL * seasonalForecast));
   }
   function getForecastValue(acc, monthIndex) {
-      if(acc.forecastType === 'fixed') { return Math.round(acc.hist.y2025.reduce((a,b)=>a+b,0) / 12); } 
-      else if(acc.forecastType === 'seasonal') { return ensembleForecast(acc.hist.y2024.concat(acc.hist.y2025), monthIndex); }
-      return 0;
+      if(acc.forecastType === 'fixed') { return Math.round(acc.hist.y2025.reduce((a,b)=>a+b,0) / 12); } else if(acc.forecastType === 'seasonal') { return ensembleForecast(acc.hist.y2024.concat(acc.hist.y2025), monthIndex); } return 0;
   }
 
   window.updateWeightsUI = function() {
-      let ma = parseFloat(document.getElementById('weightMA')?.value) || 0;
-      let lr = parseFloat(document.getElementById('weightLR')?.value) || 0;
-      let se = parseFloat(document.getElementById('weightSeasonal')?.value) || 0;
+      let ma = parseFloat(document.getElementById('weightMA')?.value) || 0; let lr = parseFloat(document.getElementById('weightLR')?.value) || 0; let se = parseFloat(document.getElementById('weightSeasonal')?.value) || 0;
       let total = ma + lr + se; if(total === 0) total = 1;
-      document.getElementById('actualMA').innerText = ((ma/total)*100).toFixed(1) + '%';
-      document.getElementById('actualLR').innerText = ((lr/total)*100).toFixed(1) + '%';
-      document.getElementById('actualSeasonal').innerText = ((se/total)*100).toFixed(1) + '%';
+      document.getElementById('actualMA').innerText = ((ma/total)*100).toFixed(1) + '%'; document.getElementById('actualLR').innerText = ((lr/total)*100).toFixed(1) + '%'; document.getElementById('actualSeasonal').innerText = ((se/total)*100).toFixed(1) + '%';
   }
   window.applyWeightsAndRecalc = function() {
-      let ma = parseFloat(document.getElementById('weightMA').value) || 0;
-      let lr = parseFloat(document.getElementById('weightLR').value) || 0;
-      let se = parseFloat(document.getElementById('weightSeasonal').value) || 0;
+      let ma = parseFloat(document.getElementById('weightMA').value) || 0; let lr = parseFloat(document.getElementById('weightLR').value) || 0; let se = parseFloat(document.getElementById('weightSeasonal').value) || 0;
       let total = ma + lr + se; if(total === 0) { alert('مجموع الأوزان يجب أن يكون أكبر من صفر'); return; }
       W_MA = ma / total; W_LR = lr / total; W_SEASONAL = se / total;
       buildForecastTable(); alert('تم تطبيق الأوزان وحساب التنبؤات'); applyPermissions(); saveDataToFirebase();
   }
 
   window.addItem = async function() {
-      let name = document.getElementById('newName').value;
-      let group = document.getElementById('newGroup').value;
-      let fType = document.getElementById('newType').value;
+      let name = document.getElementById('newName').value; let group = document.getElementById('newGroup').value; let fType = document.getElementById('newType').value;
       if(!name) return alert('أدخل اسم البند');
       accounts.push({ id: 'custom_'+Date.now(), name, group, type: 'cost', forecastType: fType, isSystem: false, hist: { y2024: Array(12).fill(0), y2025: Array(12).fill(0) } });
-      document.getElementById('newName').value = '';
-      await saveDataToFirebase(); buildAll(); applyPermissions();
+      document.getElementById('newName').value = ''; await saveDataToFirebase(); buildAll(); applyPermissions();
   }
-  window.deleteItem = async function(id) {
-      if(!confirm('حذف البند؟')) return;
-      accounts = accounts.filter(a => a.id !== id);
-      await saveDataToFirebase(); buildAll(); applyPermissions();
-  }
+  window.deleteItem = async function(id) { if(!confirm('حذف البند؟')) return; accounts = accounts.filter(a => a.id !== id); await saveDataToFirebase(); buildAll(); applyPermissions(); }
 
   function buildForecastTable() {
       let html = '';
       html += renderGroupRows('rev', 'row-rev');
-      html += `<tr class="row-total"><td class="bold-text">إجمالي الإيرادات</td>${months.map(m=>`<td class="input-total" id="total_rev_${m}"></td>`).join('')}<td class="input-total" id="total_rev_sum"></td></tr>`;
+      html += `<tr class="row-total"><td class="bold-text forecast-sticky-name">إجمالي الإيرادات</td>${months.map(m=>`<td class="input-total" id="total_rev_${m}"></td>`).join('')}<td class="input-total forecast-sticky-total" id="total_rev_sum"></td></tr>`;
       html += renderGroupRows('cogs', 'row-cogs');
-      html += `<tr class="row-total"><td class="bold-text">إجمالي تكلفة البضاعة</td>${months.map(m=>`<td class="input-total" id="total_cogs_${m}"></td>`).join('')}<td class="input-total" id="total_cogs_sum"></td></tr>`;
-      html += `<tr class="row-profit"><td class="bold-text">مجمل الربح</td>${months.map(m=>`<td class="input-total" id="gross_${m}"></td>`).join('')}<td class="input-total" id="gross_sum"></td></tr>`;
+      html += `<tr class="row-total"><td class="bold-text forecast-sticky-name">إجمالي تكلفة البضاعة</td>${months.map(m=>`<td class="input-total" id="total_cogs_${m}"></td>`).join('')}<td class="input-total forecast-sticky-total" id="total_cogs_sum"></td></tr>`;
+      html += `<tr class="row-profit"><td class="bold-text forecast-sticky-name">مجمل الربح</td>${months.map(m=>`<td class="input-total" id="gross_${m}"></td>`).join('')}<td class="input-total forecast-sticky-total" id="gross_sum"></td></tr>`;
       html += renderGroupRows('opex', 'row-opex');
-      html += `<tr class="row-total"><td class="bold-text">إجمالي التكاليف التشغيلية</td>${months.map(m=>`<td class="input-total" id="total_opex_${m}"></td>`).join('')}<td class="input-total" id="total_opex_sum"></td></tr>`;
+      html += `<tr class="row-total"><td class="bold-text forecast-sticky-name">إجمالي التكاليف التشغيلية</td>${months.map(m=>`<td class="input-total" id="total_opex_${m}"></td>`).join('')}<td class="input-total forecast-sticky-total" id="total_opex_sum"></td></tr>`;
       html += renderGroupRows('admin', 'row-admin');
-      html += `<tr class="row-total"><td class="bold-text">إجمالي التكاليف الإدارية</td>${months.map(m=>`<td class="input-total" id="total_admin_${m}"></td>`).join('')}<td class="input-total" id="total_admin_sum"></td></tr>`;
-      html += `<tr class="row-profit"><td class="bold-text">صافي الربح قبل الزكاة</td>${months.map(m=>`<td class="input-total" id="net_${m}"></td>`).join('')}<td class="input-total" id="net_sum"></td></tr>`;
+      html += `<tr class="row-total"><td class="bold-text forecast-sticky-name">إجمالي التكاليف الإدارية</td>${months.map(m=>`<td class="input-total" id="total_admin_${m}"></td>`).join('')}<td class="input-total forecast-sticky-total" id="total_admin_sum"></td></tr>`;
+      html += `<tr class="row-profit"><td class="bold-text forecast-sticky-name">صافي الربح قبل الزكاة</td>${months.map(m=>`<td class="input-total" id="net_${m}"></td>`).join('')}<td class="input-total forecast-sticky-total" id="net_sum"></td></tr>`;
       document.getElementById("forecastBody").innerHTML = html; calculateTotals();
   }
   
@@ -380,24 +332,18 @@
       let html = '';
       accounts.filter(a => a.group === group).forEach(acc => {
           let tagHtml = acc.forecastType === 'fixed' ? '<span class="tag tag-fixed">ثابت</span>' : '<span class="tag tag-seasonal">موسمي</span>';
-          html += `<tr class="${rowClass}"><td style="text-align:right; font-weight:600;">${tagHtml} ${acc.name}</td>`;
+          html += `<tr class="${rowClass}"><td class="forecast-sticky-name">${tagHtml} ${acc.name}</td>`;
           months.forEach((m, i) => {
-              let inputClass = i < 4 ? 'input-actual' : 'input-forecast';
-              let val = i < 4 ? (acc.hist.y2026?.[i] || '') : getForecastValue(acc, i);
+              let inputClass = i < 4 ? 'input-actual' : 'input-forecast'; let val = i < 4 ? (acc.hist.y2026?.[i] || '') : getForecastValue(acc, i);
               html += `<td><input type="number" class="${inputClass}" id="${acc.id}_${m}" value="${val}" onchange="window.handleForecastInput('${acc.id}', '${m}', ${i}, this.value)"></td>`;
           });
-          html += `<td class="input-total" id="sum_${acc.id}"></td></tr>`;
+          html += `<td class="input-total forecast-sticky-total" id="sum_${acc.id}"></td></tr>`;
       });
       return html;
   }
 
   window.handleForecastInput = function(accId, month, monthIndex, value) {
-      let acc = accounts.find(a => a.id === accId);
-      if(acc) {
-          if(!acc.hist.y2026) acc.hist.y2026 = Array(12).fill(0);
-          acc.hist.y2026[monthIndex] = parseFloat(value) || 0;
-          calculateTotals(); debouncedSave();
-      }
+      let acc = accounts.find(a => a.id === accId); if(acc) { if(!acc.hist.y2026) acc.hist.y2026 = Array(12).fill(0); acc.hist.y2026[monthIndex] = parseFloat(value) || 0; calculateTotals(); debouncedSave(); }
   }
 
   function calculateTotals() {
@@ -405,11 +351,9 @@
       months.forEach((m, i) => {
           let rev=0, cogs=0, opex=0, admin=0;
           accounts.forEach(acc => {
-              let el = document.getElementById(`${acc.id}_${m}`);
-              let val = el ? (parseFloat(el.value) || 0) : 0;
+              let el = document.getElementById(`${acc.id}_${m}`); let val = el ? (parseFloat(el.value) || 0) : 0;
               if(acc.group === 'rev') rev += val; else if(acc.group === 'cogs') cogs += val; else if(acc.group === 'opex') opex += val; else if(acc.group === 'admin') admin += val;
-              let sumEl = document.getElementById(`sum_${acc.id}`);
-              if(sumEl) { let rowSum = 0; months.forEach(mm => { let e = document.getElementById(`${acc.id}_${mm}`); rowSum += e ? (parseFloat(e.value)||0) : 0; }); sumEl.innerText = rowSum.toLocaleString(); }
+              let sumEl = document.getElementById(`sum_${acc.id}`); if(sumEl) { let rowSum = 0; months.forEach(mm => { let e = document.getElementById(`${acc.id}_${mm}`); rowSum += e ? (parseFloat(e.value)||0) : 0; }); sumEl.innerText = rowSum.toLocaleString(); }
           });
           let gross = rev - cogs, net = gross - opex - admin;
           document.getElementById(`total_rev_${m}`).innerText = rev.toLocaleString(); document.getElementById(`total_cogs_${m}`).innerText = cogs.toLocaleString();
@@ -423,106 +367,69 @@
       document.getElementById("sumRev").innerText = sums.rev.toLocaleString(); document.getElementById("sumGross").innerText = sums.gross.toLocaleString(); document.getElementById("sumNet").innerText = sums.net.toLocaleString();
   }
 
-  // ================= جدول البيانات التاريخية المحدث (Sticky Columns) =================
   function buildHistTable() {
-      let html = '';
-      const groupColors = { rev: 'row-rev', cogs: 'row-cogs', opex: 'row-opex', admin: 'row-admin' };
+      let html = ''; const groupColors = { rev: 'row-rev', cogs: 'row-cogs', opex: 'row-opex', admin: 'row-admin' };
       const renderGroupHist = (groupId, title) => {
           html += `<tr class="row-title"><td class="hist-sticky-1" style="background:var(--gray-200)"></td><td class="hist-sticky-2" style="background:var(--gray-200); text-align:right; color:var(--gray-800);">${title}</td><td class="hist-sticky-3" style="background:var(--gray-200)"></td><td colspan="13" style="background:var(--gray-200); text-align:right; color:var(--gray-800);"></td></tr>`;
           accounts.filter(a => a.group === groupId).forEach(acc => {
               [2024, 2025].forEach(year => {
                   const rowClass = groupColors[groupId] || '';
-                  html += `<tr class="${rowClass}">`;
-                  html += `<td class="hist-sticky-1">${!acc.isSystem ? `<button class="btn btn-delete" onclick="window.deleteItem('${acc.id}')">حذف</button>` : ''}</td>`;
-                  html += `<td class="hist-sticky-2">${acc.name}</td>`;
-                  html += `<td class="hist-sticky-3">${year}</td>`;
+                  html += `<tr class="${rowClass}"><td class="hist-sticky-1">${!acc.isSystem ? `<button class="btn btn-delete" onclick="window.deleteItem('${acc.id}')">حذف</button>` : ''}</td><td class="hist-sticky-2">${acc.name}</td><td class="hist-sticky-3">${year}</td>`;
                   acc.hist[`y${year}`].forEach((v, i) => { html += `<td><input type="number" class="input-hist" value="${v}" onchange="window.updateHist('${acc.id}', 'y${year}', ${i}, this.value)"></td>`; });
                   html += `<td style="background:var(--gray-100); font-weight:800;">${acc.hist[`y${year}`].reduce((a,b)=>a+b,0).toLocaleString()}</td></tr>`;
               });
           });
       };
-      renderGroupHist('rev', 'الإيرادات'); renderGroupHist('cogs', 'تكاليف البضاعة'); renderGroupHist('opex', 'التكاليف التشغيلية'); renderGroupHist('admin', 'التكاليف الإدارية');
+      renderGroupHist('rev', 'الإيرادات'); renderGroupHist('cogs', 'تكاليف البضاعة'); renderCompGroup('opex', 'التكاليف التشغيلية'); renderCompGroup('admin', 'التكاليف الإدارية');
       document.getElementById("histBody").innerHTML = html;
   }
   
-  window.updateHist = async function(id, yKey, index, value) {
-      let acc = accounts.find(a => a.id === id);
-      if(acc) {
-          acc.hist[yKey][index] = parseFloat(value) || 0;
-          await saveDataToFirebase(); buildHistTable(); applyPermissions();
-      }
-  }
+  window.updateHist = async function(id, yKey, index, value) { let acc = accounts.find(a => a.id === id); if(acc) { acc.hist[yKey][index] = parseFloat(value) || 0; await saveDataToFirebase(); buildHistTable(); applyPermissions(); } }
 
   function updateCompTable() {
       let html = '';
       const calcNet = (year) => accounts.reduce((sum, acc) => { let val = acc.hist[`y${year}`]?.reduce((a,b)=>a+b,0) || 0; if(acc.group==='rev') return sum+val; if(['cogs','opex','admin'].includes(acc.group)) return sum-val; return sum; }, 0);
       const renderCompGroup = (groupId) => {
           accounts.filter(a => a.group === groupId).forEach(acc => {
-              let sum24 = acc.hist.y2024.reduce((a,b)=>a+b,0), sum25 = acc.hist.y2025.reduce((a,b)=>a+b,0);
-              let sum26 = parseFloat(document.getElementById(`sum_${acc.id}`)?.innerText.replace(/,/g, '') || 0);
+              let sum24 = acc.hist.y2024.reduce((a,b)=>a+b,0), sum25 = acc.hist.y2025.reduce((a,b)=>a+b,0); let sum26 = parseFloat(document.getElementById(`sum_${acc.id}`)?.innerText.replace(/,/g, '') || 0);
               let c1 = sum24 !== 0 ? ((sum25 - sum24) / sum24 * 100) : 0, c2 = sum25 !== 0 ? ((sum26 - sum25) / sum25 * 100) : 0;
-              html += `<tr><td style="text-align:right; font-weight:600;">${acc.name}</td><td>${sum24.toLocaleString()}</td><td>${sum25.toLocaleString()}</td><td style="font-weight:700; color:var(--primary);">${sum26.toLocaleString()}</td><td class="${c1<0?'negative':'positive'}">${c1.toFixed(1)}%</td><td class="${c2<0?'negative':'positive'}">${c2.toFixed(1)}%</td></tr>`;
+              html += `<tr><td class="comp-sticky-name">${acc.name}</td><td>${sum24.toLocaleString()}</td><td>${sum25.toLocaleString()}</td><td style="font-weight:700; color:var(--primary);">${sum26.toLocaleString()}</td><td class="${c1<0?'negative':'positive'}">${c1.toFixed(1)}%</td><td class="${c2<0?'negative':'positive'}">${c2.toFixed(1)}%</td></tr>`;
           });
       };
       renderCompGroup('rev'); renderCompGroup('cogs'); renderCompGroup('opex'); renderCompGroup('admin');
       let n24 = calcNet(2024), n25 = calcNet(2025), n26 = parseFloat(document.getElementById("net_sum").innerText.replace(/,/g,''))||0;
       let nc1 = n24!==0?((n25-n24)/n24*100):0, nc2 = n25!==0?((n26-n25)/n25*100):0;
-      html += `<tr style="background:var(--success-light);font-weight:800;border-top:3px solid var(--success);"><td>صافي الربح</td><td>${n24.toLocaleString()}</td><td>${n25.toLocaleString()}</td><td style="color:var(--primary);">${n26.toLocaleString()}</td><td class="${nc1<0?'negative':'positive'}">${nc1.toFixed(1)}%</td><td class="${nc2<0?'negative':'positive'}">${nc2.toFixed(1)}%</td></tr>`;
+      html += `<tr style="background:var(--success-light);font-weight:800;border-top:3px solid var(--success);"><td class="comp-sticky-name" style="background:var(--success-light);">صافي الربح</td><td>${n24.toLocaleString()}</td><td>${n25.toLocaleString()}</td><td style="color:var(--primary);">${n26.toLocaleString()}</td><td class="${nc1<0?'negative':'positive'}">${nc1.toFixed(1)}%</td><td class="${nc2<0?'negative':'positive'}">${nc2.toFixed(1)}%</td></tr>`;
       document.getElementById("compBody").innerHTML = html;
   }
 
   function getYearlyAggregates(year) {
-      let data = { rev: 0, cogs: 0, opex: 0, admin: 0 };
-      accounts.forEach(acc => { let val = acc.hist[`y${year}`]?.reduce((a,b) => a + (b||0), 0) || 0; if(acc.group==='rev') data.rev += val; else if(acc.group==='cogs') data.cogs += val; else if(acc.group==='opex') data.opex += val; else if(acc.group==='admin') data.admin += val; });
+      let data = { rev: 0, cogs: 0, opex: 0, admin: 0 }; accounts.forEach(acc => { let val = acc.hist[`y${year}`]?.reduce((a,b) => a + (b||0), 0) || 0; if(acc.group==='rev') data.rev += val; else if(acc.group==='cogs') data.cogs += val; else if(acc.group==='opex') data.opex += val; else if(acc.group==='admin') data.admin += val; });
       data.gross = data.rev - data.cogs; data.net = data.gross - data.opex - data.admin; return data;
   }
 
   function updateChartsAndRatios() {
-      calculateTotals();
-      const data24 = getYearlyAggregates(2024), data25 = getYearlyAggregates(2025);
+      calculateTotals(); const data24 = getYearlyAggregates(2024), data25 = getYearlyAggregates(2025);
       const data26 = { rev: parseFloat(document.getElementById("total_rev_sum").innerText.replace(/,/g, '')) || 0, cogs: parseFloat(document.getElementById("total_cogs_sum").innerText.replace(/,/g, '')) || 0, opex: parseFloat(document.getElementById("total_opex_sum").innerText.replace(/,/g, '')) || 0, admin: parseFloat(document.getElementById("total_admin_sum").innerText.replace(/,/g, '')) || 0, gross: parseFloat(document.getElementById("gross_sum").innerText.replace(/,/g, '')) || 0, net: parseFloat(document.getElementById("net_sum").innerText.replace(/,/g, '')) || 0 };
-
-      const ctx1 = document.getElementById('trendChart').getContext('2d');
-      if(trendChartInstance) trendChartInstance.destroy();
-      trendChartInstance = new Chart(ctx1, {
-          type: 'line', data: { labels: ['2024', '2025', '2026 (فعلي+تنبؤ)'], datasets: [
-              { label: 'إجمالي الإيرادات', data: [data24.rev, data25.rev, data26.rev], borderColor: '#4f46e5', backgroundColor: '#eef2ff', fill: true, tension: 0.3, borderWidth: 3 },
-              { label: 'صافي الربح', data: [data24.net, data25.net, data26.net], borderColor: '#10b981', backgroundColor: '#ecfdf5', fill: true, tension: 0.3, borderWidth: 3 }
-          ]}, options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { callback: value => (value/1000000).toFixed(1) + 'M' } } } }
-      });
-
-      const ctx2 = document.getElementById('breakdownChart').getContext('2d');
-      if(breakdownChartInstance) breakdownChartInstance.destroy();
-      breakdownChartInstance = new Chart(ctx2, {
-          type: 'bar', data: { labels: ['2024', '2025', '2026'], datasets: [
-              { label: 'تكلفة البضاعة', data: [data24.cogs, data25.cogs, data26.cogs], backgroundColor: '#ef4444', borderRadius: 4 },
-              { label: 'تشغيلية', data: [data24.opex, data25.opex, data26.opex], backgroundColor: '#f59e0b', borderRadius: 4 },
-              { label: 'إدارية', data: [data24.admin, data25.admin, data26.admin], backgroundColor: '#3b82f6', borderRadius: 4 },
-              { label: 'صافي الربح', data: [data24.net, data25.net, data26.net], backgroundColor: '#10b981', borderRadius: 4 }
-          ]}, options: { responsive: true, scales: { x: { stacked: true }, y: { stacked: true, ticks: { callback: value => (value/1000000).toFixed(1) + 'M' } } } }
-      });
-
+      const ctx1 = document.getElementById('trendChart').getContext('2d'); if(trendChartInstance) trendChartInstance.destroy();
+      trendChartInstance = new Chart(ctx1, { type: 'line', data: { labels: ['2024', '2025', '2026 (فعلي+تنبؤ)'], datasets: [ { label: 'إجمالي الإيرادات', data: [data24.rev, data25.rev, data26.rev], borderColor: '#4f46e5', backgroundColor: '#eef2ff', fill: true, tension: 0.3, borderWidth: 3 }, { label: 'صافي الربح', data: [data24.net, data25.net, data26.net], borderColor: '#10b981', backgroundColor: '#ecfdf5', fill: true, tension: 0.3, borderWidth: 3 } ]}, options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { callback: value => (value/1000000).toFixed(1) + 'M' } } } } });
+      const ctx2 = document.getElementById('breakdownChart').getContext('2d'); if(breakdownChartInstance) breakdownChartInstance.destroy();
+      breakdownChartInstance = new Chart(ctx2, { type: 'bar', data: { labels: ['2024', '2025', '2026'], datasets: [ { label: 'تكلفة البضاعة', data: [data24.cogs, data25.cogs, data26.cogs], backgroundColor: '#ef4444', borderRadius: 4 }, { label: 'تشغيلية', data: [data24.opex, data25.opex, data26.opex], backgroundColor: '#f59e0b', borderRadius: 4 }, { label: 'إدارية', data: [data24.admin, data25.admin, data26.admin], backgroundColor: '#3b82f6', borderRadius: 4 }, { label: 'صافي الربح', data: [data24.net, data25.net, data26.net], backgroundColor: '#10b981', borderRadius: 4 } ]}, options: { responsive: true, scales: { x: { stacked: true }, y: { stacked: true, ticks: { callback: value => (value/1000000).toFixed(1) + 'M' } } } } });
       const calcRatio = (num, den) => den === 0 ? '0%' : ((num/den)*100).toFixed(1) + '%';
       document.getElementById("ratiosGrid").innerHTML = `
           <div class="ratio-card"><h4>هامش مجمل الربح</h4><div class="ratio-values"><div class="ratio-year"><label>2024</label><span>${calcRatio(data24.gross, data24.rev)}</span></div><div class="ratio-year"><label>2025</label><span>${calcRatio(data25.gross, data25.rev)}</span></div><div class="ratio-year highlight"><label>2026</label><span>${calcRatio(data26.gross, data26.rev)}</span></div></div></div>
           <div class="ratio-card"><h4>هامش صافي الربح</h4><div class="ratio-values"><div class="ratio-year"><label>2024</label><span>${calcRatio(data24.net, data24.rev)}</span></div><div class="ratio-year"><label>2025</label><span>${calcRatio(data25.net, data25.rev)}</span></div><div class="ratio-year highlight"><label>2026</label><span>${calcRatio(data26.net, data26.rev)}</span></div></div></div>
           <div class="ratio-card"><h4>نسبة تكلفة البضاعة للإيرادات</h4><div class="ratio-values"><div class="ratio-year"><label>2024</label><span>${calcRatio(data24.cogs, data24.rev)}</span></div><div class="ratio-year"><label>2025</label><span>${calcRatio(data25.cogs, data25.rev)}</span></div><div class="ratio-year highlight"><label>2026</label><span>${calcRatio(data26.cogs, data26.rev)}</span></div></div></div>
-          <div class="ratio-card"><h4>نسبة التكاليف التشغيلية للإيرادات</h4><div class="ratio-values"><div class="ratio-year"><label>2024</label><span>${calcRatio(data24.opex, data24.rev)}</span></div><div class="ratio-year"><label>2025</label><span>${calcRatio(data25.opex, data25.rev)}</span></div><div class="ratio-year highlight"><label>2026</label><span>${calcRatio(data26.opex, data26.rev)}</span></div></div></div>
-      `;
+          <div class="ratio-card"><h4>نسبة التكاليف التشغيلية للإيرادات</h4><div class="ratio-values"><div class="ratio-year"><label>2024</label><span>${calcRatio(data24.opex, data24.rev)}</span></div><div class="ratio-year"><label>2025</label><span>${calcRatio(data25.opex, data25.rev)}</span></div><div class="ratio-year highlight"><label>2026</label><span>${calcRatio(data26.opex, data26.rev)}</span></div></div></div>`;
   }
 
   window.switchTab = function(tabId, btnElement) {
-      document.querySelectorAll('.tab-content').forEach(div => div.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      btnElement.classList.add('active');
-      if(tabId === 'tab3') { calculateTotals(); updateCompTable(); }
-      if(tabId === 'tab2') { buildHistTable(); applyPermissions(); }
-      if(tabId === 'tab4') { updateChartsAndRatios(); }
+      document.querySelectorAll('.tab-content').forEach(div => div.classList.remove('active')); document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active'); btnElement.classList.add('active');
+      if(tabId === 'tab3') { calculateTotals(); updateCompTable(); } if(tabId === 'tab2') { buildHistTable(); applyPermissions(); } if(tabId === 'tab4') { updateChartsAndRatios(); }
   }
 
   function buildAll() { buildForecastTable(); buildHistTable(); updateWeightsUI(); }
-
 </script>
 </body>
 </html>
