@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام التنبؤ المالي - زاد الجود (سحابي)</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5; --primary-light: #eef2ff; --success: #10b981; --success-light: #ecfdf5;
+            --warning: #f59e0b; --warning-light: #fffbeb; --danger: #ef4444; --danger-light: #fef2f2;
+            --purple: #8b5cf6; --purple-light: #f5f3ff; --gray-50: #f9fafb; --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb; --gray-300: #d1d5db; --gray-600: #4b5563; --gray-800: #1f2937;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05); --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+            --radius: 12px; --radius-sm: 8px;
+        }
+        body { font-family: 'Tajawal', sans-serif; background-color: var(--gray-100); margin: 0; padding: 24px; color: var(--gray-800); line-height: 1.5; }
+        #login-screen { display: flex; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #4f46e5 0%, #1f2937 100%); }
+        .login-card { background: white; padding: 40px; border-radius: 16px; width: 100%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); text-align: center; }
+        .login-logo { font-size: 50px; margin-bottom: 10px; } .login-title { font-size: 22px; font-weight: 800; color: var(--gray-800); margin-bottom: 5px; }
+        .login-subtitle { font-size: 14px; color: var(--gray-600); margin-bottom: 30px; }
+        .login-input { width: 100%; padding: 14px 16px; margin-bottom: 16px; border: 1px solid var(--gray-300); border-radius: var(--radius-sm); font-size: 15px; font-family: 'Tajawal', sans-serif; box-sizing: border-box; }
+        .login-input:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+        .login-btn { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: var(--radius-sm); font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Tajawal', sans-serif; }
+        .login-btn:hover { background: #4338ca; } .login-error { color: var(--danger); font-size: 13px; font-weight: 700; margin-top: 15px; display: none; }
+        #app-container { display: none; max-width: 1440px; margin: auto; background: white; padding: 24px; border-radius: 16px; box-shadow: var(--shadow-lg); position: relative; }
+        .app-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid var(--gray-200); padding-bottom: 10px; }
+        .app-brand { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 800; color: var(--primary); }
+        .user-badge { background: var(--gray-100); padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 700; color: var(--gray-600); border: 1px solid var(--gray-200); }
+        .logout-btn { background: transparent; border: 1px solid var(--danger); color: var(--danger); padding: 6px 16px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 12px; font-family: 'Tajawal', sans-serif; margin-right: 10px;}
+        .logout-btn:hover { background: var(--danger); color: white; }
+        .sync-badge { font-size: 11px; color: var(--success); font-weight: 700; margin-right: 10px; }
+        h2 { font-size: 18px; color: var(--gray-800); font-weight: 700; margin-bottom: 16px; border-bottom: 2px solid var(--gray-200); padding-bottom: 8px; }
+        h3 { font-size: 14px; color: var(--gray-600); font-weight: 700; }
+        .tabs { display: flex; gap: 8px; margin-bottom: 24px; background: var(--gray-50); padding: 6px; border-radius: var(--radius); box-shadow: inset 0 2px 4px 0 rgba(0,0,0,0.05); }
+        .tab-btn { flex: 1; padding: 12px 16px; background: transparent; border: none; border-radius: var(--radius-sm); cursor: pointer; font-weight: 700; font-size: 14px; transition: all 0.3s ease; color: var(--gray-600); font-family: 'Tajawal', sans-serif; }
+        .tab-btn:hover { background: white; color: var(--primary); } .tab-btn.active { background: white; color: var(--primary); box-shadow: var(--shadow-sm); }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; } .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+        .table-container { border: 1px solid var(--gray-200); border-radius: var(--radius); overflow: hidden; margin-bottom: 24px; box-shadow: var(--shadow-sm); }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; } th, td { padding: 8px 10px; text-align: center; border-bottom: 1px solid var(--gray-100); }
+        th { background-color: var(--gray-800); color: white; font-weight: 600; position: sticky; top: 0; z-index: 10; }
+        .header-actual { background-color: var(--success); } .header-forecast { background-color: var(--purple); }
+        input, select { padding: 6px 8px; border: 1px solid transparent; border-radius: 6px; text-align: center; font-size: 12px; background: transparent; font-family: 'Tajawal', sans-serif; width: 90px; }
+        input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); background: white; }
+        .input-actual { background-color: var(--success-light) !important; font-weight: 600; } .input-forecast { background-color: var(--purple-light) !important; font-weight: 600; color: var(--purple); }
+        .input-hist { background-color: var(--warning-light) !important; } .input-total { background-color: var(--gray-100) !important; font-weight: 800; color: var(--gray-800); }
+        input:disabled, select:disabled { opacity: 0.6; cursor: not-allowed; background-color: var(--gray-100) !important; border-color: transparent !important; }
+        tr:hover { background-color: var(--gray-50); } .row-rev { background-color: #eff6ff; } .row-cogs { background-color: #fff1f2; } .row-opex { background-color: var(--warning-light); } .row-admin { background-color: #f0f9ff; }
+        .row-profit { background-color: var(--success-light); font-weight: bold; border-top: 2px solid var(--success); }
+        .row-total { background-color: var(--gray-100); font-weight: bold; border-top: 2px solid var(--gray-300); } .bold-text { font-weight: 800; }
+        .tag { font-size: 9px; padding: 2px 6px; border-radius: 12px; color: white; margin-left: 5px; display: inline-block; font-weight: 700; }
+        .tag-fixed { background: var(--gray-600); } .tag-seasonal { background: var(--purple); }
+        .summary-boxes { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+        .summary-box { background: white; padding: 20px; border-radius: var(--radius); border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); text-align: center; transition: transform 0.2s; }
+        .summary-box:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .summary-box.rev-box { border-top: 4px solid var(--primary); } .summary-box.gross-box { border-top: 4px solid var(--warning); } .summary-box.net-box { border-top: 4px solid var(--success); }
+        .summary-box label { display: block; font-size: 13px; color: var(--gray-600); margin-bottom: 8px; font-weight: 700; } .summary-box span { display: block; font-size: 22px; font-weight: 800; color: var(--gray-800); }
+        .negative { color: var(--danger); font-weight: bold; } .positive { color: var(--success); font-weight: bold; }
+        .btn { border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 700; font-size: 12px; margin: 2px; transition: all 0.2s; font-family: 'Tajawal', sans-serif; display: inline-flex; align-items: center; gap: 6px; }
+        .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-sm); } .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+        .btn-update { background: var(--warning); color: white; } .btn-add { background: var(--success); color: white; } .btn-delete { background: var(--danger); color: white; padding: 4px 8px; font-size: 10px; } .btn-apply { background: var(--primary); color: white; padding: 10px 20px; font-size: 13px; }
+        .add-form { background: var(--gray-50); padding: 16px; border-radius: var(--radius-sm); margin-bottom: 16px; display: flex; gap: 12px; align-items: center; border: 1px solid var(--gray-200); }
+        .add-form input[type="text"] { width: 200px; text-align: right; }
+        .weights-panel { background: linear-gradient(135deg, var(--primary-light), #ffffff); border: 1px solid var(--primary); border-radius: var(--radius); padding: 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 24px; flex-wrap: wrap; box-shadow: var(--shadow-sm); }
+        .weights-panel h3 { margin: 0; color: var(--primary); font-size: 16px; }
+        .weight-group { display: flex; flex-direction: column; align-items: center; background: white; padding: 12px; border-radius: var(--radius-sm); border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); min-width: 100px; }
+        .weight-group label { font-size: 11px; font-weight: 700; color: var(--gray-600); margin-bottom: 8px; }
+        .weight-group input[type="number"] { width: 70px; font-size: 18px; font-weight: 800; border: 1px solid var(--gray-300); border-radius: 6px; }
+        .actual-weights { font-size: 11px; color: var(--primary); margin-top: 6px; font-weight: 700; }
+        .charts-container { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; } @media (max-width: 900px) { .charts-container { grid-template-columns: 1fr; } }
+        .chart-box { background: white; padding: 20px; border-radius: var(--radius); border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); }
+        .ratios-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+        .ratio-card { background: white; border: 1px solid var(--gray-200); padding: 20px; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); transition: transform 0.2s; }
+        .ratio-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); } .ratio-card h4 { margin: 0 0 16px 0; color: var(--gray-800); font-size: 14px; border-bottom: 1px solid var(--gray-100); padding-bottom: 8px; }
+        .ratio-values { display: flex; justify-content: space-around; text-align: center; } .ratio-year label { display: block; color: var(--gray-600); font-weight: 700; font-size: 12px; margin-bottom: 4px; }
+        .ratio-year span { font-size: 20px; font-weight: 800; color: var(--gray-800); } .ratio-year.highlight span { color: var(--primary); }
+    </style>
+</head>
+<body>
+
+<div id="login-screen">
+    <div class="login-card">
+        <div class="login-logo">🍔</div>
+        <div class="login-title">زاد الجود للوجبات السريعة</div>
+        <div class="login-subtitle">نظام التنبؤ المالي المتقدم - 2026 (سحابي)</div>
+        <input type="text" id="username" class="login-input" placeholder="اسم المستخدم">
+        <input type="password" id="password" class="login-input" placeholder="كلمة المرور">
+        <button class="login-btn" onclick="login()">تسجيل الدخول</button>
+        <div id="login-error" class="login-error">اسم المستخدم أو كلمة المرور غير صحيحة</div>
+        <div style="margin-top: 20px; font-size: 11px; color: var(--gray-600); text-align: right;">
+            <strong>للتجربة:</strong><br> مدير: admin / 1234<br> مشاهد: viewer / 0000
+        </div>
+    </div>
+</div>
+
+<div id="app-container">
+    <div class="app-header">
+        <div class="app-brand">🍔 زاد الجود (سحابي)</div>
+        <div style="display: flex; align-items: center;">
+            <span id="sync-status" class="sync-badge">☁️ متصل</span>
+            <span id="user-badge" class="user-badge"></span>
+            <button class="logout-btn" onclick="logout()">خروج</button>
+        </div>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('tab1')">💰 التنبؤ</button>
+        <button class="tab-btn" onclick="switchTab('tab2')">🗂️ التاريخ</button>
+        <button class="tab-btn" onclick="switchTab('tab3')">📊 المقارنة</button>
+        <button class="tab-btn" onclick="switchTab('tab4')">📈 التحليل</button>
+    </div>
+
+    <div id="tab1" class="tab-content active">
+        <div class="weights-panel" id="weights-panel-ui">
+            <h3>⚖️ أوزان التنبؤ</h3>
+            <div class="weight-group"><label>المتوسط المتحرك</label><input type="number" id="weightMA" value="30" min="0" max="100" oninput="updateWeightsUI()"><div class="actual-weights" id="actualMA">30%</div></div>
+            <div class="weight-group"><label>الانحدار الخطي</label><input type="number" id="weightLR" value="30" min="0" max="100" oninput="updateWeightsUI()"><div class="actual-weights" id="actualLR">30%</div></div>
+            <div class="weight-group"><label>الموسمية</label><input type="number" id="weightSeasonal" value="40" min="0" max="100" oninput="updateWeightsUI()"><div class="actual-weights" id="actualSeasonal">40%</div></div>
+            <button class="btn btn-apply" onclick="applyWeightsAndRecalc()">🔄 تطبيق وحفظ</button>
+        </div>
+        <div class="summary-boxes">
+            <div class="summary-box rev-box"><label>إجمالي الإيرادات 2026</label><span id="sumRev">0</span></div>
+            <div class="summary-box gross-box"><label>مجمل الربح 2026</label><span id="sumGross">0</span></div>
+            <div class="summary-box net-box"><label>صافي الربح 2026</label><span id="sumNet">0</span></div>
+        </div>
+        <div class="table-container" style="overflow-x: auto; max-height: 70vh;">
+            <table><thead><tr><th rowspan="2" style="width: 200px; position: sticky; left:0; z-index:11; background: var(--gray-800);">البيان</th><th colspan="4" class="header-actual">الفعلي 2026</th><th colspan="8" class="header-forecast">التنبؤ 2026</th><th rowspan="2" style="background: var(--gray-600);">إجمالي 2026</th></tr><tr><th class="header-actual">يناير</th><th class="header-actual">فبراير</th><th class="header-actual">مارس</th><th class="header-actual">أبريل</th><th class="header-forecast">مايو</th><th class="header-forecast">يونيو</th><th class="header-forecast">يوليو</th><th class="header-forecast">أغسطس</th><th class="header-forecast">سبتمبر</th><th class="header-forecast">أكتوبر</th><th class="header-forecast">نوفمبر</th><th class="header-forecast">ديسمبر</th></tr></thead><tbody id="forecastBody"></tbody></table>
+        </div>
+    </div>
+
+    <div id="tab2" class="tab-content">
+        <h2>البيانات التاريخية الفعلية (2024 - 2025)</h2>
+        <div class="add-form" id="add-form-ui">
+            <label style="font-weight:700; color:var(--gray-600);"><strong>إضافة بند:</strong></label>
+            <input type="text" id="newName" placeholder="اسم البند">
+            <select id="newGroup" style="border:1px solid var(--gray-300); width:150px;"><option value="cogs">تكلفة بضاعة</option><option value="opex">تشغيلية</option><option value="admin">إدارية</option></select>
+            <select id="newType" style="border:1px solid var(--gray-300); width:120px;"><option value="seasonal">موسمي</option><option value="fixed">ثابت</option></select>
+            <button class="btn btn-add" onclick="addItem()">+ إضافة وحفظ</button>
+        </div>
+        <div class="table-container" style="overflow-x: auto; max-height: 60vh;">
+            <table><thead><tr><th>إجراء</th><th>البيان</th><th>السنة</th><th>يناير</th><th>فبراير</th><th>مارس</th><th>أبريل</th><th>مايو</th><th>يونيو</th><th>يوليو</th><th>أغسطس</th><th>سبتمبر</th><th>أكتوبر</th><th>نوفمبر</th><th>ديسمبر</th><th style="background:var(--gray-600)">الإجمالي</th></tr></thead><tbody id="histBody"></tbody></table>
+        </div>
+    </div>
+
+    <div id="tab3" class="tab-content">
+        <h2>المقارنة السنوية ونسب التغير</h2>
+        <div class="table-container" style="overflow-x: auto;"><table><thead><tr><th>البيان</th><th>2024</th><th>2025</th><th>2026</th><th>التغير 24←25</th><th>التغير 25←26</th></tr></thead><tbody id="compBody"></tbody></table></div>
+    </div>
+
+    <div id="tab4" class="tab-content">
+        <h2>📈 التحليل البياني والنسب المالية لقائمة الدخل</h2>
+        <div class="charts-container">
+            <div class="chart-box"><h3 style="text-align:center;">مقارنة الإيرادات وصافي الربح (سنوي)</h3><canvas id="trendChart"></canvas></div>
+            <div class="chart-box"><h3 style="text-align:center;">هيكل التكاليف والأرباح (سنوي)</h3><canvas id="breakdownChart"></canvas></div>
+        </div>
+        <h3 style="margin-bottom: 16px;">النسب المالية الأساسية</h3>
+        <div class="ratios-grid" id="ratiosGrid"></div>
+    </div>
+</div>
+
+<!-- ================= Firebase & App Logic ================= -->
+<script type="module">
+  // 1. إعدادات Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+  import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDyGVZKjpxWdqnE3brj5l3OjjOAPhYn8x0",
+    authDomain: "financial-forcast-95786.firebaseapp.com",
+    projectId: "financial-forcast-95786",
+    storageBucket: "financial-forcast-95786.firebasestorage.app",
+    messagingSenderId: "180041737366",
+    appId: "1:180041737366:web:f11403e2d693c95b674eb7",
+    measurementId: "G-297ZBLW19K"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // 2. المتغيرات الأساسية
+  const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+  let W_MA = 0.30, W_LR = 0.30, W_SEASONAL = 0.40;
+  let trendChartInstance = null, breakdownChartInstance = null;
+  let currentUser = null;
+
+  // البيانات الافتراضية (تُستخدم فقط في أول مرة إذا كانت قاعدة البيانات فارغة)
+  const defaultAccounts = [
+    { id: 'rev', name: 'إيرادات النشاط', group: 'rev', type: 'revenue', forecastType: 'seasonal', isSystem: true, hist: { y2024: [2286722,2361899,1769553,1419441,3105270,1841862,3014738,2810509,2424254,2968869,2505047,2999607], y2025: [3408295,3276475,1920708,3236267,4622174,3377130,5905022,5573789,6015802,6482907,5902119,5384580] } },
+    { id: 'meals', name: 'عدد الوجبات', group: 'rev', type: 'meals', forecastType: 'seasonal', isSystem: true, hist: { y2024: Array(12).fill(0), y2025: Array(12).fill(0) } },
+    { id: 'cogs_1', name: 'خامات - لحوم', group: 'cogs', type: 'cost', forecastType: 'seasonal', isSystem: false, hist: { y2024: [152028,162944,161058,90674,253937,115073,181287,137732,153434,267986,135911,180646], y2025: [195977,200482,159948,247669,396213,250684,540355,471590,429215,569835,439902,566447] } },
+    { id: 'cogs_2', name: 'إيجار سيارات نقل', group: 'opex', type: 'cost', forecastType: 'fixed', isSystem: false, hist: { y2024: Array(12).fill(450000), y2025: Array(12).fill(600000) } },
+    { id: 'admin_1', name: 'راتب الشريك', group: 'admin', type: 'cost', forecastType: 'fixed', isSystem: false, hist: { y2024: Array(12).fill(25000), y2025: Array(12).fill(25000) } }
+  ];
+
+  let accounts = []; // ستتم تعبئتها من Firebase
+
+  // 3. دوال Firebase (قراءة وحفظ)
+  async function loadDataFromFirebase() {
+      document.getElementById('sync-status').innerText = '⏳ جاري التحميل...';
+      const accountsRef = ref(db, 'accounts');
+      const snapshot = await get(accountsRef);
+      if (snapshot.exists()) {
+          accounts = snapshot.val();
+      } else {
+          // أول مرة، ارفع البيانات الافتراضية
+          accounts = JSON.parse(JSON.stringify(defaultAccounts));
+          await saveDataToFirebase();
+      }
+      document.getElementById('sync-status').innerText = '☁️ متصل';
+      buildAll();
+      applyPermissions();
+  }
+
+  async function saveDataToFirebase() {
+      document.getElementById('sync-status').innerText = '💾 جاري الحفظ...';
+      try {
+          await set(ref(db, 'accounts'), accounts);
+          document.getElementById('sync-status').innerText = '☁️ تم الحفظ (متصل)';
+      } catch (error) {
+          console.error("Error saving data:", error);
+          document.getElementById('sync-status').innerText = '❌ خطأ في الحفظ';
+      }
+  }
+
+  // 4. النظام الأمني
+  const systemUsers = { admin: { password: '1234', role: 'admin', name: 'مدير النظام' }, viewer: { password: '0000', role: 'viewer', name: 'مستخدم للعرض فقط' } };
+  
+  window.handleEnter = function(event) { if (event.key === "Enter") window.login(); }
+  document.getElementById('password').addEventListener('keypress', window.handleEnter);
+
+  window.login = function() {
+      const u = document.getElementById('username').value;
+      const p = document.getElementById('password').value;
+      if (systemUsers[u] && systemUsers[u].password === p) {
+          currentUser = systemUsers[u];
+          document.getElementById('login-screen').style.display = 'none';
+          document.getElementById('app-container').style.display = 'block';
+          document.getElementById('user-badge').innerText = `👤 ${currentUser.name}`;
+          loadDataFromFirebase(); // تحميل البيانات بعد الدخول
+      } else {
+          document.getElementById('login-error').style.display = 'block';
+      }
+  }
+  window.logout = function() {
+      currentUser = null; accounts = [];
+      document.getElementById('app-container').style.display = 'none';
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('username').value = ''; document.getElementById('password').value = '';
+      document.getElementById('login-error').style.display = 'none';
+  }
+
+  function applyPermissions() {
+      const isAdmin = currentUser?.role === 'admin';
+      setTimeout(() => {
+          if (!isAdmin) {
+              document.querySelectorAll('input[type="number"]').forEach(input => { if(!input.id.startsWith('weight')) input.disabled = true; });
+              document.querySelectorAll('.btn-add, .btn-delete, .btn-update, .btn-apply').forEach(btn => btn.disabled = true);
+              document.querySelectorAll('#add-form-ui input, #add-form-ui select').forEach(el => el.disabled = true);
+              document.querySelectorAll('#weights-panel-ui input[type="number"]').forEach(el => el.disabled = true);
+          }
+      }, 100);
+  }
+
+  // 5. منطق النظام المالي
+  function ensembleForecast(historicalArray, targetMonthIndex) {
+      let Y = historicalArray.filter(v => v !== null && v !== 0);
+      if(Y.length < 3) return Math.round(Y.length > 0 ? Y[Y.length-1] : 0);
+      let N = Y.length, X = Array.from({length: N}, (_, i) => i + 1);
+      let sumX = X.reduce((a,b)=>a+b,0), sumY = Y.reduce((a,b)=>a+b,0);
+      let sumXY = X.reduce((a,b,i)=>a+b*Y[i],0), sumX2 = X.reduce((a,b)=>a+b*b,0);
+      let b = (N * sumXY - sumX * sumY) / (N * sumX2 - sumX * sumX);
+      let a = (sumY - b * sumX) / N;
+      let lrForecast = a + b * (N + targetMonthIndex + 1);
+      let maForecast = Y.slice(-3).reduce((a,b)=>a+b,0) / 3;
+      let m1 = historicalArray[targetMonthIndex] || sumY/N; 
+      let m2 = historicalArray[targetMonthIndex + 12] || sumY/N; 
+      let seasonalIndex = ((m1 + m2) / 2) / (sumY / 24);
+      let seasonalForecast = lrForecast * seasonalIndex;
+      return Math.round((W_MA * maForecast) + (W_LR * lrForecast) + (W_SEASONAL * seasonalForecast));
+  }
+  function getForecastValue(acc, monthIndex) {
+      if(acc.forecastType === 'fixed') { return Math.round(acc.hist.y2025.reduce((a,b)=>a+b,0) / 12); } 
+      else if(acc.forecastType === 'seasonal') { return ensembleForecast(acc.hist.y2024.concat(acc.hist.y2025), monthIndex); }
+      return 0;
+  }
+
+  window.updateWeightsUI = function() {
+      let ma = parseFloat(document.getElementById('weightMA')?.value) || 0;
+      let lr = parseFloat(document.getElementById('weightLR')?.value) || 0;
+      let se = parseFloat(document.getElementById('weightSeasonal')?.value) || 0;
+      let total = ma + lr + se; if(total === 0) total = 1;
+      if(document.getElementById('actualMA')) {
+          document.getElementById('actualMA').innerText = ((ma/total)*100).toFixed(1) + '%';
+          document.getElementById('actualLR').innerText = ((lr/total)*100).toFixed(1) + '%';
+          document.getElementById('actualSeasonal').innerText = ((se/total)*100).toFixed(1) + '%';
+      }
+  }
+  window.applyWeightsAndRecalc = function() {
+      let ma = parseFloat(document.getElementById('weightMA').value) || 0;
+      let lr = parseFloat(document.getElementById('weightLR').value) || 0;
+      let se = parseFloat(document.getElementById('weightSeasonal').value) || 0;
+      let total = ma + lr + se; if(total === 0) { alert('مجموع الأوزان يجب أن يكون أكبر من صفر'); return; }
+      W_MA = ma / total; W_LR = lr / total; W_SEASONAL = se / total;
+      buildForecastTable(); alert('تم تطبيق الأوزان وحساب التنبؤات'); applyPermissions();
+  }
+
+  window.addItem = async function() {
+      let name = document.getElementById('newName').value;
+      let group = document.getElementById('newGroup').value;
+      let fType = document.getElementById('newType').value;
+      if(!name) return alert('أدخل اسم البند');
+      accounts.push({ id: 'custom_'+Date.now(), name, group, type: 'cost', forecastType: fType, isSystem: false, hist: { y2024: Array(12).fill(0), y2025: Array(12).fill(0) } });
+      document.getElementById('newName').value = '';
+      await saveDataToFirebase(); // حفظ في السحابة
+      buildAll(); applyPermissions();
+  }
+  window.deleteItem = async function(id) {
+      if(!confirm('حذف البند؟')) return;
+      accounts = accounts.filter(a => a.id !== id);
+      await saveDataToFirebase(); // حفظ في السحابة
+      buildAll(); applyPermissions();
+  }
+
+  function buildForecastTable() {
+      let html = '';
+      html += renderGroupRows('rev', 'row-rev');
+      html += `<tr class="row-total"><td class="bold-text">إجمالي الإيرادات</td>${months.map(m=>`<td class="input-total" id="total_rev_${m}"></td>`).join('')}<td class="input-total" id="total_rev_sum"></td></tr>`;
+      html += renderGroupRows('cogs', 'row-cogs');
+      html += `<tr class="row-total"><td class="bold-text">إجمالي تكلفة البضاعة</td>${months.map(m=>`<td class="input-total" id="total_cogs_${m}"></td>`).join('')}<td class="input-total" id="total_cogs_sum"></td></tr>`;
+      html += `<tr class="row-profit"><td class="bold-text">مجمل الربح</td>${months.map(m=>`<td class="input-total" id="gross_${m}"></td>`).join('')}<td class="input-total" id="gross_sum"></td></tr>`;
+      html += renderGroupRows('opex', 'row-opex');
+      html += `<tr class="row-total"><td class="bold-text">إجمالي التكاليف التشغيلية</td>${months.map(m=>`<td class="input-total" id="total_opex_${m}"></td>`).join('')}<td class="input-total" id="total_opex_sum"></td></tr>`;
+      html += renderGroupRows('admin', 'row-admin');
+      html += `<tr class="row-total"><td class="bold-text">إجمالي التكاليف الإدارية</td>${months.map(m=>`<td class="input-total" id="total_admin_${m}"></td>`).join('')}<td class="input-total" id="total_admin_sum"></td></tr>`;
+      html += `<tr class="row-profit"><td class="bold-text">صافي الربح قبل الزكاة</td>${months.map(m=>`<td class="input-total" id="net_${m}"></td>`).join('')}<td class="input-total" id="net_sum"></td></tr>`;
+      document.getElementById("forecastBody").innerHTML = html; calculateTotals();
+  }
+  function renderGroupRows(group, rowClass) {
+      let html = '';
+      accounts.filter(a => a.group === group).forEach(acc => {
+          let tagHtml = acc.forecastType === 'fixed' ? '<span class="tag tag-fixed">ثابت</span>' : '<span class="tag tag-seasonal">موسمي</span>';
+          html += `<tr class="${rowClass}"><td style="text-align:right; font-weight:600;">${tagHtml} ${acc.name}</td>`;
+          months.forEach((m, i) => {
+              let inputClass = i < 4 ? 'input-actual' : 'input-forecast';
+              let val = i < 4 ? (acc.hist.y2026?.[i] || '') : getForecastValue(acc, i); // قراءة الفعلي لـ 2026 إن وجد
+              html += `<td><input type="number" class="${inputClass}" id="${acc.id}_${m}" value="${val}" oninput="handleForecastInput('${acc.id}', '${m}', ${i}, this.value)"></td>`;
+          });
+          html += `<td class="input-total" id="sum_${acc.id}"></td></tr>`;
+      });
+      return html;
+  }
+  
+  // دالة جديدة لمعالجة الإدخال في التنبؤات (حفظ كفعلي 2026)
+  window.handleForecastInput = function(accId, month, monthIndex, value) {
+      let acc = accounts.find(a => a.id === accId);
+      if(acc) {
+          if(!acc.hist.y2026) acc.hist.y2026 = Array(12).fill(0); // إنشاء مصفوفة 2026
+          acc.hist.y2026[monthIndex] = parseFloat(value) || 0;
+          calculateTotals();
+          // حفظ تلقائي في السحابة عند التعديل (مع تأخير بسيط)
+          clearTimeout(window.saveTimeout);
+          window.saveTimeout = setTimeout(() => saveDataToFirebase(), 1500);
+      }
+  }
+
+  function calculateTotals() {
+      let sums = { rev: 0, cogs: 0, opex: 0, admin: 0, gross: 0, net: 0 };
+      months.forEach((m, i) => {
+          let rev=0, cogs=0, opex=0, admin=0;
+          accounts.forEach(acc => {
+              let el = document.getElementById(`${acc.id}_${m}`);
+              let val = el ? (parseFloat(el.value) || 0) : 0;
+              if(acc.group === 'rev') rev += val; else if(acc.group === 'cogs') cogs += val; else if(acc.group === 'opex') opex += val; else if(acc.group === 'admin') admin += val;
+              let sumEl = document.getElementById(`sum_${acc.id}`);
+              if(sumEl) { let rowSum = 0; months.forEach(mm => { let e = document.getElementById(`${acc.id}_${mm}`); rowSum += e ? (parseFloat(e.value)||0) : 0; }); sumEl.innerText = rowSum.toLocaleString(); }
+          });
+          let gross = rev - cogs, net = gross - opex - admin;
+          document.getElementById(`total_rev_${m}`).innerText = rev.toLocaleString(); document.getElementById(`total_cogs_${m}`).innerText = cogs.toLocaleString();
+          document.getElementById(`gross_${m}`).innerText = gross.toLocaleString(); document.getElementById(`total_opex_${m}`).innerText = opex.toLocaleString();
+          document.getElementById(`total_admin_${m}`).innerText = admin.toLocaleString(); document.getElementById(`net_${m}`).innerText = net.toLocaleString();
+          sums.rev += rev; sums.cogs += cogs; sums.opex += opex; sums.admin += admin; sums.gross += gross; sums.net += net;
+      });
+      document.getElementById(`total_rev_sum`).innerText = sums.rev.toLocaleString(); document.getElementById(`total_cogs_sum`).innerText = sums.cogs.toLocaleString();
+      document.getElementById(`gross_sum`).innerText = sums.gross.toLocaleString(); document.getElementById(`total_opex_sum`).innerText = sums.opex.toLocaleString();
+      document.getElementById(`total_admin_sum`).innerText = sums.admin.toLocaleString(); document.getElementById(`net_sum`).innerText = sums.net.toLocaleString();
+      document.getElementById("sumRev").innerText = sums.rev.toLocaleString(); document.getElementById("sumGross").innerText = sums.gross.toLocaleString(); document.getElementById("sumNet").innerText = sums.net.toLocaleString();
+  }
+
+  function buildHistTable() {
+      let html = '';
+      const renderGroupHist = (groupId, title) => {
+          html += `<tr><td colspan="16" style="background:var(--gray-200); font-weight:800; text-align:right; color:var(--gray-800);">${title}</td></tr>`;
+          accounts.filter(a => a.group === groupId).forEach(acc => {
+              [2024, 2025].forEach(year => {
+                  html += `<tr><td>${!acc.isSystem ? `<button class="btn btn-delete" onclick="deleteItem('${acc.id}')">حذف</button>` : ''}</td><td style="text-align:right; font-weight:600;">${acc.name}</td><td style="font-weight:700;">${year}</td>`;
+                  acc.hist[`y${year}`].forEach((v, i) => { html += `<td><input type="number" class="input-hist" value="${v}" onchange="updateHist('${acc.id}', 'y${year}', ${i}, this.value)"></td>`; });
+                  html += `<td style="background:var(--gray-100); font-weight:800;">${acc.hist[`y${year}`].reduce((a,b)=>a+b,0).toLocaleString()}</td></tr>`;
+              });
+          });
+      };
+      renderGroupHist('rev', 'الإيرادات'); renderGroupHist('cogs', 'تكاليف البضاعة'); renderGroupHist('opex', 'التكاليف التشغيلية'); renderGroupHist('admin', 'التكاليف الإدارية');
+      document.getElementById("histBody").innerHTML = html;
+  }
+  
+  window.updateHist = async function(id, yKey, index, value) {
+      let acc = accounts.find(a => a.id === id);
+      if(acc) {
+          acc.hist[yKey][index] = parseFloat(value) || 0;
+          await saveDataToFirebase();
+          buildHistTable(); applyPermissions(); // إعادة بناء لتحديث الإجماليات
+      }
+  }
+  window.recalculateFromHistory = function() { buildForecastTable(); alert('تم إعادة الحساب بناءً على السحابة'); applyPermissions(); }
+
+  function updateCompTable() {
+      let html = '';
+      const calcNet = (year) => accounts.reduce((sum, acc) => { let val = acc.hist[`y${year}`]?.reduce((a,b)=>a+b,0) || 0; if(acc.group==='rev') return sum+val; if(['cogs','opex','admin'].includes(acc.group)) return sum-val; return sum; }, 0);
+      const renderCompGroup = (groupId) => {
+          accounts.filter(a => a.group === groupId).forEach(acc => {
+              let sum24 = acc.hist.y2024.reduce((a,b)=>a+b,0), sum25 = acc.hist.y2025.reduce((a,b)=>a+b,0);
+              let sum26 = parseFloat(document.getElementById(`sum_${acc.id}`)?.innerText.replace(/,/g, '') || 0);
+              let c1 = sum24 !== 0 ? ((sum25 - sum24) / sum24 * 100) : 0, c2 = sum25 !== 0 ? ((sum26 - sum25) / sum25 * 100) : 0;
+              html += `<tr><td style="text-align:right; font-weight:600;">${acc.name}</td><td>${sum24.toLocaleString()}</td><td>${sum25.toLocaleString()}</td><td style="font-weight:700; color:var(--primary);">${sum26.toLocaleString()}</td><td class="${c1<0?'negative':'positive'}">${c1.toFixed(1)}%</td><td class="${c2<0?'negative':'positive'}">${c2.toFixed(1)}%</td></tr>`;
+          });
+      };
+      renderCompGroup('rev'); renderCompGroup('cogs'); renderCompGroup('opex'); renderCompGroup('admin');
+      let n24 = calcNet(2024), n25 = calcNet(2025), n26 = parseFloat(document.getElementById("net_sum").innerText.replace(/,/g,''))||0;
+      let nc1 = n24!==0?((n25-n24)/n24*100):0, nc2 = n25!==0?((n26-n25)/n25*100):0;
+      html += `<tr style="background:var(--success-light);font-weight:800;border-top:3px solid var(--success);"><td>صافي الربح</td><td>${n24.toLocaleString()}</td><td>${n25.toLocaleString()}</td><td style="color:var(--primary);">${n26.toLocaleString()}</td><td class="${nc1<0?'negative':'positive'}">${nc1.toFixed(1)}%</td><td class="${nc2<0?'negative':'positive'}">${nc2.toFixed(1)}%</td></tr>`;
+      document.getElementById("compBody").innerHTML = html;
+  }
+
+  function getYearlyAggregates(year) {
+      let data = { rev: 0, cogs: 0, opex: 0, admin: 0 };
+      accounts.forEach(acc => { let val = acc.hist[`y${year}`]?.reduce((a,b) => a + (b||0), 0) || 0; if(acc.group==='rev') data.rev += val; else if(acc.group==='cogs') data.cogs += val; else if(acc.group==='opex') data.opex += val; else if(acc.group==='admin') data.admin += val; });
+      data.gross = data.rev - data.cogs; data.net = data.gross - data.opex - data.admin; return data;
+  }
+
+  function updateChartsAndRatios() {
+      calculateTotals();
+      const data24 = getYearlyAggregates(2024), data25 = getYearlyAggregates(2025);
+      const data26 = { rev: parseFloat(document.getElementById("total_rev_sum").innerText.replace(/,/g, '')) || 0, cogs: parseFloat(document.getElementById("total_cogs_sum").innerText.replace(/,/g, '')) || 0, opex: parseFloat(document.getElementById("total_opex_sum").innerText.replace(/,/g, '')) || 0, admin: parseFloat(document.getElementById("total_admin_sum").innerText.replace(/,/g, '')) || 0, gross: parseFloat(document.getElementById("gross_sum").innerText.replace(/,/g, '')) || 0, net: parseFloat(document.getElementById("net_sum").innerText.replace(/,/g, '')) || 0 };
+
+      const ctx1 = document.getElementById('trendChart').getContext('2d');
+      if(trendChartInstance) trendChartInstance.destroy();
+      trendChartInstance = new Chart(ctx1, {
+          type: 'line', data: { labels: ['2024', '2025', '2026 (فعلي+تنبؤ)'], datasets: [
+              { label: 'إجمالي الإيرادات', data: [data24.rev, data25.rev, data26.rev], borderColor: '#4f46e5', backgroundColor: '#eef2ff', fill: true, tension: 0.3, borderWidth: 3 },
+              { label: 'صافي الربح', data: [data24.net, data25.net, data26.net], borderColor: '#10b981', backgroundColor: '#ecfdf5', fill: true, tension: 0.3, borderWidth: 3 }
+          ]}, options: { responsive: true, scales: { y: { beginAtZero: true, ticks: { callback: value => (value/1000000).toFixed(1) + 'M' } } } }
+      });
+
+      const ctx2 = document.getElementById('breakdownChart').getContext('2d');
+      if(breakdownChartInstance) breakdownChartInstance.destroy();
+      breakdownChartInstance = new Chart(ctx2, {
+          type: 'bar', data: { labels: ['2024', '2025', '2026'], datasets: [
+              { label: 'تكلفة البضاعة', data: [data24.cogs, data25.cogs, data26.cogs], backgroundColor: '#ef4444', borderRadius: 4 },
+              { label: 'تشغيلية', data: [data24.opex, data25.opex, data26.opex], backgroundColor: '#f59e0b', borderRadius: 4 },
+              { label: 'إدارية', data: [data24.admin, data25.admin, data26.admin], backgroundColor: '#3b82f6', borderRadius: 4 },
+              { label: 'صافي الربح', data: [data24.net, data25.net, data26.net], backgroundColor: '#10b981', borderRadius: 4 }
+          ]}, options: { responsive: true, scales: { x: { stacked: true }, y: { stacked: true, ticks: { callback: value => (value/1000000).toFixed(1) + 'M' } } } }
+      });
+
+      const calcRatio = (num, den) => den === 0 ? '0%' : ((num/den)*100).toFixed(1) + '%';
+      document.getElementById("ratiosGrid").innerHTML = `
+          <div class="ratio-card"><h4>هامش مجمل الربح</h4><div class="ratio-values"><div class="ratio-year"><label>2024</label><span>${calcRatio(data24.gross, data24.rev)}</span></div><div class="ratio-year"><label>2025</label><span>${calcRatio(data25.gross, data25.rev)}</span></div><div class="ratio-year highlight"><label>2026</label><span>${calcRatio(data26.gross, data26.rev)}</span></div></div></div>
+          <div class="ratio-card"><h4>هامش صافي الربح</h4><div class="ratio-values"><div class="ratio-year"><label>2024</label><span>${calcRatio(data24.net, data24.rev)}</span></div><div class="ratio-year"><label>2025</label><span>${calcRatio(data25.net, data25.rev)}</span></div><div class="ratio-year highlight"><label>2026</label><span>${calcRatio(data26.net, data26.rev)}</span></div></div></div>
+          <div class="ratio-card"><h4>نسبة تكلفة البضاعة للإيرادات</h4><div class="ratio-values"><div class="ratio-year"><label>2024</label><span>${calcRatio(data24.cogs, data24.rev)}</span></div><div class="ratio-year"><label>2025</label><span>${calcRatio(data25.cogs, data25.rev)}</span></div><div class="ratio-year highlight"><label>2026</label><span>${calcRatio(data26.cogs, data26.rev)}</span></div></div></div>
+          <div class="ratio-card"><h4>نسبة التكاليف التشغيلية للإيرادات</h4><div class="ratio-values"><div class="ratio-year"><label>2024</label><span>${calcRatio(data24.opex, data24.rev)}</span></div><div class="ratio-year"><label>2025</label><span>${calcRatio(data25.opex, data25.rev)}</span></div><div class="ratio-year highlight"><label>2026</label><span>${calcRatio(data26.opex, data26.rev)}</span></div></div></div>
+      `;
+  }
+
+  window.switchTab = function(tabId) {
+      document.querySelectorAll('.tab-content').forEach(div => div.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+      event.currentTarget.classList.add('active');
+      if(tabId === 'tab3') { calculateTotals(); updateCompTable(); }
+      if(tabId === 'tab2') { buildHistTable(); applyPermissions(); }
+      if(tabId === 'tab4') { updateChartsAndRatios(); }
+  }
+
+  function buildAll() { buildForecastTable(); buildHistTable(); updateWeightsUI(); }
+
+</script>
+</body>
+</html>
