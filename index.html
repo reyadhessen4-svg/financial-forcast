@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
-:root{--primary:#4f46e5;--primary-light:#eef2ff;--success:#10b981;--success-light:#ecfdf5;--warning:#f59e0b;--warning-light:#fffbeb;--danger:#ef4444;--danger-light:#fef2f2;--purple:#8b5cf6;--purple-light:#f5f3ff;--indigo:#6366f1;--indigo-light:#eef2ff;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-600:#4b5563;--gray-800:#1f2937;--radius:12px;--radius-sm:8px}
+:root{--primary:#4f46e5;--primary-light:#eef2ff;--success:#10b981;--success-light:#ecfdf5;--warning:#f59e0b;--warning-light:#fffbeb;--danger:#ef4444;--danger-light:#fef2f2;--purple:#8b5cf6;--purple-light:#f5f3ff;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-600:#4b5563;--gray-800:#1f2937;--radius:12px;--radius-sm:8px}
 *{box-sizing:border-box}body{font-family:'Tajawal',sans-serif;background:var(--gray-100);margin:0;color:var(--gray-800);line-height:1.6;font-size:15px}
 #login-screen{display:flex;justify-content:center;align-items:center;min-height:100vh;background:linear-gradient(135deg,#4f46e5,#1f2937);padding:20px}
 .login-card{background:#fff;padding:44px;border-radius:16px;width:100%;max-width:420px;box-shadow:0 20px 25px rgba(0,0,0,.2);text-align:center}
@@ -46,8 +46,7 @@ input,select{padding:8px 10px;border:1px solid transparent;border-radius:6px;tex
 input:focus,select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 1px var(--primary);background:#fff}
 .input-forecast{background:var(--purple-light)!important;font-weight:700;color:var(--purple);font-size:14px}.input-hist{background:transparent!important;font-size:14px}.input-total{background:var(--gray-100)!important;font-weight:800;color:var(--gray-800);font-size:14px}
 input:disabled,select:disabled,button:disabled{opacity:.5;cursor:not-allowed!important;box-shadow:none!important;background:var(--gray-100)!important;color:var(--gray-600)!important;border-color:transparent!important}
-tr.row-rev{background:#eff6ff}tr.row-cogs{background:#fff1f2}tr.row-opex{background:var(--warning-light)}tr.row-marketing{background:var(--indigo-light)}tr.row-admin{background:#f0f9ff}
-tr.row-title{background:var(--gray-200);font-weight:800}tr.row-sub-title{background:#f8fafc;font-weight:700;font-size:13px}
+tr.row-rev{background:#eff6ff}tr.row-cogs{background:#fff1f2}tr.row-opex{background:var(--warning-light)}tr.row-admin{background:#f0f9ff}tr.row-marketing{background:var(--purple-light)}tr.row-title{background:var(--gray-200);font-weight:800}
 .row-profit{background:var(--success-light)!important;font-weight:bold;border-top:2px solid var(--success)}.row-total{background:var(--gray-100);font-weight:bold;border-top:2px solid var(--gray-300)}.bold-text{font-weight:800}
 .tag{font-size:10px;padding:3px 8px;border-radius:12px;color:#fff;margin-left:6px;display:inline-block;font-weight:700}.tag-fixed{background:var(--gray-600)}.tag-seasonal{background:var(--purple)}
 .forecast-sticky-name{position:sticky;right:0;z-index:5;min-width:220px;text-align:right;font-weight:700;background:inherit;border-left:2px solid var(--gray-200);font-size:14px}.forecast-sticky-total{position:sticky;left:0;z-index:5;min-width:120px;background:inherit;border-right:2px solid var(--gray-200);font-size:14px;font-weight:800}
@@ -107,8 +106,6 @@ th.hist-sticky-1,th.hist-sticky-2,th.hist-sticky-3{background:var(--gray-800);z-
 .var-month-cell{font-size:12px;color:var(--gray-600);font-weight:700}
 .reset-panel{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px;padding:14px 18px;background:linear-gradient(135deg,var(--danger-light),#fff);border:1px solid #fecaca;border-radius:var(--radius-sm)}
 .reset-panel label{font-weight:800;font-size:14px;color:var(--danger)}
-.row-current-actual{background:#faf5ff!important}
-input.num-input{direction:ltr;text-align:center;font-variant-numeric:tabular-nums}
 </style>
 </head>
 <body>
@@ -150,6 +147,7 @@ input.num-input{direction:ltr;text-align:center;font-variant-numeric:tabular-num
 <div class="weight-group"><label>المتوسط المتحرك</label><input type="number" id="weightMA" value="30" min="0" max="100" oninput="window.updateWeightsUI()"><div class="actual-weights" id="actualMA">30%</div></div>
 <div class="weight-group"><label>الانحدار الخطي</label><input type="number" id="weightLR" value="30" min="0" max="100" oninput="window.updateWeightsUI()"><div class="actual-weights" id="actualLR">30%</div></div>
 <div class="weight-group"><label>الموسمية</label><input type="number" id="weightSeasonal" value="40" min="0" max="100" oninput="window.updateWeightsUI()"><div class="actual-weights" id="actualSeasonal">40%</div></div>
+<div class="weight-group"><label>فترة النظر (سنوات)</label><input type="number" id="lookbackYears" value="3" min="1" max="10" oninput="window.updateWeightsUI()"><div class="actual-weights" id="actualLookback">3 سنوات</div></div>
 <button class="btn btn-apply" onclick="window.applyWeightsAndRecalc()">🔄 تطبيق وحفظ التنبؤ</button>
 </div>
 <div class="summary-boxes">
@@ -168,7 +166,8 @@ input.num-input{direction:ltr;text-align:center;font-variant-numeric:tabular-num
 <button class="scroll-nav-btn" onclick="window.jumpToSection('section-rev')">الإيرادات</button>
 <button class="scroll-nav-btn" onclick="window.jumpToSection('section-cogs')">تكلفة البضاعة</button>
 <button class="scroll-nav-btn" onclick="window.jumpToSection('section-gross')">مجمل الربح</button>
-<button class="scroll-nav-btn" onclick="window.jumpToSection('section-opexmkt')">التشغيلية والتسويقية</button>
+<button class="scroll-nav-btn" onclick="window.jumpToSection('section-opex')">التشغيلية</button>
+<button class="scroll-nav-btn" onclick="window.jumpToSection('section-marketing')">التسويقية</button>
 <button class="scroll-nav-btn" onclick="window.jumpToSection('section-admin')">الإدارية</button>
 <button class="scroll-nav-btn" onclick="window.jumpToSection('section-net')">صافي الربح</button>
 </div>
@@ -207,12 +206,7 @@ input.num-input{direction:ltr;text-align:center;font-variant-numeric:tabular-num
 <div class="add-form" id="add-form-ui">
 <label style="font-weight:700">إضافة بند:</label>
 <input type="text" id="newName" placeholder="اسم البند">
-<select id="newGroup" style="border:1px solid var(--gray-300);width:180px">
-<option value="cogs">تكلفة بضاعة</option>
-<option value="opex_other">تشغيلية أخري</option>
-<option value="marketing">تسويقية</option>
-<option value="admin">إدارية</option>
-</select>
+<select id="newGroup" style="border:1px solid var(--gray-300);width:160px"><option value="cogs">تكلفة بضاعة</option><option value="opex_other">تشغيلية أخري</option><option value="marketing">تسويقية</option><option value="admin">إدارية</option></select>
 <select id="newType" style="border:1px solid var(--gray-300);width:130px"><option value="seasonal">موسمي</option><option value="fixed">ثابت</option></select>
 <button class="btn btn-add" onclick="window.addItem()">+ إضافة</button>
 </div>
@@ -282,31 +276,22 @@ input.num-input{direction:ltr;text-align:center;font-variant-numeric:tabular-num
 <script>
 var DB=null,fbReady=false,currentUser=null,saveTimeout=null,targetYear=2026;
 var W_MA=0.30,W_LR=0.30,W_SEASONAL=0.40;
+var lookbackYears=3;
 var trendChartInstance=null,breakdownChartInstance=null;
 var months=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
 var monthsAr=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
 var defaultUsers={admin:{password:'1234',role:'admin',name:'مدير النظام'},viewer:{password:'0000',role:'viewer',name:'مشاهد'}};
 var dbUsers=null;
-
 var defaultAccounts=[
 {id:'rev',name:'إيرادات النشاط',group:'rev',type:'revenue',forecastType:'seasonal',isSystem:true,hist:{y2024:[2286722,2361899,1769553,1419441,3105270,1841862,3014738,2810509,2424254,2968869,2505047,2999607],y2025:[3408295,3276475,1920708,3236267,4622174,3377130,5905022,5573789,6015802,6482907,5902119,5384580]}},
 {id:'cogs_1',name:'خامات - لحوم',group:'cogs',type:'cost',forecastType:'seasonal',isSystem:false,hist:{y2024:[152028,162944,161058,90674,253937,115073,181287,137732,153434,267986,135911,180646],y2025:[195977,200482,159948,247669,396213,250684,540355,471590,429215,569835,439902,566447]}},
 {id:'opex_1',name:'إيجار سيارات نقل',group:'opex_other',type:'cost',forecastType:'fixed',isSystem:false,hist:{y2024:Array(12).fill(450000),y2025:Array(12).fill(600000)}},
-{id:'mkt_1',name:'إعلانات وحملات تسويقية',group:'marketing',type:'cost',forecastType:'seasonal',isSystem:false,hist:{y2024:Array(12).fill(50000),y2025:[50000,50000,70000,70000,100000,100000,50000,50000,70000,70000,100000,100000]}},
+{id:'marketing_1',name:'إعلانات وحملات تسويقية',group:'marketing',type:'cost',forecastType:'seasonal',isSystem:false,hist:{y2024:[50000,40000,45000,55000,60000,70000,80000,75000,65000,50000,55000,90000],y2025:[60000,50000,55000,65000,75000,85000,95000,90000,80000,65000,70000,110000]}},
 {id:'admin_1',name:'راتب الشريك',group:'admin',type:'cost',forecastType:'fixed',isSystem:false,hist:{y2024:Array(12).fill(25000),y2025:Array(12).fill(25000)}}
 ];
 var accounts=null;
 
-function fmt(n){if(n===0||n===null||n===undefined)return'0';return Number(n).toLocaleString('en-US')}
-function parseNum(v){if(!v)return 0;var s=String(v).replace(/,/g,'');var n=parseInt(s,10);return isNaN(n)?0:n}
-window.formatInput=function(el){var raw=el.value.replace(/,/g,'');if(raw===''){el.value='';return}var num=parseInt(raw,10);if(isNaN(num)){el.value='';return}el.value=num.toLocaleString('en-US')};
-
-/* تحويل البيانات القديمة تلقائياً للهيكل الجديد */
-function migrateOldGroups(acc){
-    if(acc.group==='opex'){acc.group='opex_other'}
-    return acc;
-}
-
+/* ===== تنظيف أعمق ===== */
 function deduplicateAccounts(){
 if(!accounts||!Array.isArray(accounts)){accounts=JSON.parse(JSON.stringify(defaultAccounts));saveLocal('accounts',accounts);return accounts}
 var seenIds={},seenNames={},cleaned=[],removedCount=0,fixedCount=0;
@@ -317,38 +302,61 @@ var nameKey=acc.name.trim();if(!nameKey){removedCount++;continue}
 if(seenIds[acc.id]){removedCount++;continue}
 if(seenNames[nameKey]){removedCount++;continue}
 seenIds[acc.id]=true;seenNames[nameKey]=true;
-acc=migrateOldGroups(acc);
 if(!acc.group)acc.group='cogs';if(!acc.forecastType)acc.forecastType='seasonal';
 if(acc.isSystem===undefined)acc.isSystem=false;if(acc.type===undefined)acc.type='cost';
 if(acc.forecast&&typeof acc.forecast==='object'){var keys=Object.keys(acc.forecast);for(var k=0;k<keys.length;k++){var yKey=keys[k];if(!Array.isArray(acc.forecast[yKey])){delete acc.forecast[yKey];fixedCount++;continue}if(acc.forecast[yKey].length!==12){var arr=acc.forecast[yKey].slice(0,12);while(arr.length<12)arr.push(0);acc.forecast[yKey]=arr;fixedCount++}for(var v=0;v<12;v++){if(typeof acc.forecast[yKey][v]!=='number'||isNaN(acc.forecast[yKey][v])){acc.forecast[yKey][v]=0;fixedCount++}}}}else{acc.forecast={}}
 if(acc.hist&&typeof acc.hist==='object'){var histKeys=Object.keys(acc.hist);for(var h=0;h<histKeys.length;h++){var hk=histKeys[h];if(!Array.isArray(acc.hist[hk])){acc.hist[hk]=Array(12).fill(0);fixedCount++;continue}if(acc.hist[hk].length!==12){var harr=acc.hist[hk].slice(0,12);while(harr.length<12)harr.push(0);acc.hist[hk]=harr;fixedCount++}for(var hv=0;hv<12;hv++){if(typeof acc.hist[hk][hv]!=='number'||isNaN(acc.hist[hk][hv])){acc.hist[hk][hv]=0;fixedCount++}}}}else{acc.hist={}}
 cleaned.push(acc);
 }
-if(removedCount>0||fixedCount>0){accounts=cleaned;saveLocal('accounts',accounts)}
+if(removedCount>0||fixedCount>0){console.log('تنظيف: إزالة '+removedCount+' مكرر، إصلاح '+fixedCount+' قيمة');accounts=cleaned;saveLocal('accounts',accounts)}
 updateDataHealth(removedCount,fixedCount);return accounts;
 }
 
-function updateDataHealth(removed,fixed){var el=document.getElementById('data-health');if(!el)return;if(removed===0&&fixed===0)el.innerHTML='<span style="color:var(--success)">✅ البيانات سليمة ('+accounts.length+' بند)</span>';else el.innerHTML='<span style="color:var(--warning)">⚠️ تم تنظيف '+removed+' مكرر و'+fixed+' قيمة تالفة</span>'}
-window.cleanDuplicates=function(){var before=accounts.length;deduplicateAccounts();var after=accounts.length;var removed=before-after;if(removed>0){buildAll();applyPermissions();if(DB)DB.ref('accounts').set(accounts);showToast('تم تنظيف '+removed+' بند مكرر/تالف','success')}else showToast('لا توجد مكررات - البيانات سليمة','info')};
+function updateDataHealth(removed,fixed){
+var el=document.getElementById('data-health');if(!el)return;
+if(removed===0&&fixed===0)el.innerHTML='<span style="color:var(--success)">✅ البيانات سليمة ('+accounts.length+' بند)</span>';
+else el.innerHTML='<span style="color:var(--warning)">⚠️ تم تنظيف '+removed+' مكرر و'+fixed+' قيمة</span>';
+}
 
-function initData(){dbUsers=loadLocal('users')||JSON.parse(JSON.stringify(defaultUsers));accounts=loadLocal('accounts')||JSON.parse(JSON.stringify(defaultAccounts));var s=loadLocal('settings');if(s)targetYear=s.targetYear||2026;deduplicateAccounts();buildMonthCheckboxes()}
+window.cleanDuplicates=function(){
+var before=accounts.length;deduplicateAccounts();var after=accounts.length;var removed=before-after;
+if(removed>0){buildAll();applyPermissions();if(DB)DB.ref('accounts').set(accounts);showToast('تم تنظيف '+removed+' بند مكرر/تالف','success')}
+else showToast('لا توجد مكررات - البيانات سليمة','info');
+};
+
+function initData(){
+dbUsers=loadLocal('users')||JSON.parse(JSON.stringify(defaultUsers));
+accounts=loadLocal('accounts')||JSON.parse(JSON.stringify(defaultAccounts));
+var s=loadLocal('settings');if(s){targetYear=s.targetYear||2026;lookbackYears=s.lookbackYears||3;var lbEl=document.getElementById('lookbackYears');if(lbEl)lbEl.value=lookbackYears;}
+deduplicateAccounts();buildMonthCheckboxes();
+}
 function setSync(state,text){var el=document.getElementById('sync-status');if(!el)return;el.className='sync-badge';if(state==='local')el.classList.add('sync-local');else if(state==='cloud')el.classList.add('sync-cloud');else if(state==='saving')el.classList.add('sync-saving');else if(state==='error')el.classList.add('sync-error');el.innerText=text}
 function saveLocal(key,data){try{localStorage.setItem('zad_'+key,JSON.stringify(data))}catch(e){}}
 function loadLocal(key){try{var d=localStorage.getItem('zad_'+key);return d?JSON.parse(d):null}catch(e){return null}}
 function loadScript(url){return new Promise(function(resolve){var s=document.createElement('script');s.src=url;s.onload=function(){resolve(true)};s.onerror=function(){resolve(false)};document.head.appendChild(s)})}
 async function initFirebase(){try{var r1=await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');if(!r1)return;var r2=await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js');if(!r2)return;if(typeof firebase==='undefined')return;var cfg={apiKey:"AIzaSyDyGVZKjpxWdqnE3brj5l3OjjOAPhYn8x0",authDomain:"financial-forcast-95786.firebaseapp.com",projectId:"financial-forcast-95786",storageBucket:"financial-forcast-95786.firebasestorage.app",messagingSenderId:"180041737366",appId:"1:180041737366:web:f11403e2d693c95b674eb7"};firebase.initializeApp(cfg);DB=firebase.database();fbReady=true;syncUsersFromCloud()}catch(e){console.error('Firebase error:',e)}}
 function syncUsersFromCloud(){if(!DB)return;DB.ref('users').once('value').then(function(snap){if(snap.exists()){dbUsers=snap.val();saveLocal('users',dbUsers)}else{DB.ref('users').set(dbUsers)}}).catch(function(){})}
-function syncDataFromCloud(){if(!DB)return;setSync('saving','⏳ مزامنة...');var p=[];p.push(DB.ref('accounts').once('value').then(function(snap){if(snap.exists()){accounts=snap.val();if(!Array.isArray(accounts))accounts=JSON.parse(JSON.stringify(defaultAccounts));deduplicateAccounts();saveLocal('accounts',accounts)}else{DB.ref('accounts').set(accounts)}}));p.push(DB.ref('settings/targetYear').once('value').then(function(snap){if(snap.exists()){targetYear=snap.val();saveLocal('settings',{targetYear:targetYear})}}));Promise.all(p).then(function(){setSync('cloud','☁️ متزامن');updateYearUI();buildAll();applyPermissions()}).catch(function(){setSync('error','⚠️ خطأ سحابي')})}
+function syncDataFromCloud(){if(!DB)return;setSync('saving','⏳ مزامنة...');var p=[];p.push(DB.ref('accounts').once('value').then(function(snap){if(snap.exists()){accounts=snap.val();if(!Array.isArray(accounts))accounts=JSON.parse(JSON.stringify(defaultAccounts));deduplicateAccounts();saveLocal('accounts',accounts)}else{DB.ref('accounts').set(accounts)}}));p.push(DB.ref('settings').once('value').then(function(snap){if(snap.exists()){targetYear=snap.val().targetYear||2026;lookbackYears=snap.val().lookbackYears||3;var lbEl=document.getElementById('lookbackYears');if(lbEl)lbEl.value=lookbackYears;saveLocal('settings',{targetYear:targetYear,lookbackYears:lookbackYears})}}));Promise.all(p).then(function(){setSync('cloud','☁️ متزامن');updateYearUI();buildAll();applyPermissions()}).catch(function(){setSync('error','⚠️ خطأ سحابي')})}
 async function saveAccounts(){saveLocal('accounts',accounts);if(!DB){setSync('local','📱 محفوظ محلياً');return}setSync('saving','💾 مزامنة...');try{await DB.ref('accounts').set(accounts);setSync('cloud','☁️ متزامن')}catch(e){setSync('error','⚠️ خطأ سحابي')}}
 async function saveUsers(){saveLocal('users',dbUsers);if(!DB)return;try{await DB.ref('users').set(dbUsers)}catch(e){}}
-async function saveSettings(){saveLocal('settings',{targetYear:targetYear});if(!DB)return;try{await DB.ref('settings').set({targetYear:targetYear})}catch(e){}}
+async function saveSettings(){saveLocal('settings',{targetYear:targetYear,lookbackYears:lookbackYears});if(!DB)return;try{await DB.ref('settings').set({targetYear:targetYear,lookbackYears:lookbackYears})}catch(e){}}
+function debouncedSave(){clearTimeout(saveTimeout);saveTimeout=setTimeout(saveAccounts,1000)}
 function showToast(msg,type){var t=document.createElement('div');t.className='toast toast-'+(type||'info');t.textContent=msg;document.body.appendChild(t);requestAnimationFrame(function(){t.classList.add('show')});setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove()},350)},3000)}
 function canDo(action){if(!currentUser)return false;var p={admin:['view','edit_data','add_item','delete_item','change_weights','manage_users','change_passwords'],editor:['view','edit_data','add_item','delete_item','change_weights'],viewer:['view']};return(p[currentUser.role]||[]).indexOf(action)!==-1}
-function applyPermissions(){document.getElementById('tab-btn-users').style.display=canDo('manage_users')?'':'none';setTimeout(function(){if(!canDo('edit_data'))document.querySelectorAll('#tab1 input,#tab2 input,#tab6 input.var-actual-input').forEach(function(i){i.disabled=true});if(!canDo('add_item'))document.querySelectorAll('.btn-add').forEach(function(b){b.disabled=true});if(!canDo('delete_item'))document.querySelectorAll('.btn-delete').forEach(function(b){b.disabled=true});if(!canDo('change_weights'))document.querySelectorAll('.weights-panel input,.weights-panel .btn-apply').forEach(function(el){el.disabled=true})},200)}
+function applyPermissions(){document.getElementById('tab-btn-users').style.display=canDo('manage_users')?'':'none';setTimeout(function(){if(!canDo('edit_data'))document.querySelectorAll('#tab1 input[type="number"],#tab2 input[type="number"]').forEach(function(i){i.disabled=true});if(!canDo('add_item'))document.querySelectorAll('.btn-add').forEach(function(b){b.disabled=true});if(!canDo('delete_item'))document.querySelectorAll('.btn-delete').forEach(function(b){b.disabled=true});if(!canDo('change_weights'))document.querySelectorAll('.weights-panel input,.weights-panel .btn-apply').forEach(function(el){el.disabled=true})},200)}
 function updateYearUI(){document.getElementById('year-display').innerText='('+targetYear+')';document.getElementById('forecast-header-year').innerText='التنبؤ '+targetYear;document.getElementById('sumRevYear').innerText=targetYear;document.getElementById('sumGrossYear').innerText=targetYear;document.getElementById('sumNetYear').innerText=targetYear;document.getElementById('comp-y-2').innerText=targetYear-2;document.getElementById('comp-y-1').innerText=targetYear-1;document.getElementById('comp-y0').innerText=targetYear}
+function fmt(n){if(n===0||n===null||n===undefined)return'0';return n.toLocaleString('en-US')}
 
 window.resetData=function(){document.getElementById('reset-modal').classList.add('show')};
-window.confirmResetData=function(){document.getElementById('reset-modal').classList.remove('show');accounts=JSON.parse(JSON.stringify(defaultAccounts));dbUsers=JSON.parse(JSON.stringify(defaultUsers));targetYear=2026;saveLocal('accounts',accounts);saveLocal('users',dbUsers);saveLocal('settings',{targetYear:targetYear});if(DB){DB.ref('accounts').set(accounts);DB.ref('users').set(dbUsers);DB.ref('settings').set({targetYear:targetYear})}updateYearUI();buildAll();applyPermissions();setSync('local','📱 تم الضبط');showToast('تم إعادة ضبط البيانات بنجاح','success')};
+window.confirmResetData=function(){
+document.getElementById('reset-modal').classList.remove('show');
+accounts=JSON.parse(JSON.stringify(defaultAccounts));dbUsers=JSON.parse(JSON.stringify(defaultUsers));targetYear=2026;lookbackYears=3;
+saveLocal('accounts',accounts);saveLocal('users',dbUsers);saveLocal('settings',{targetYear:targetYear,lookbackYears:lookbackYears});
+if(DB){DB.ref('accounts').set(accounts);DB.ref('users').set(dbUsers);DB.ref('settings').set({targetYear:targetYear,lookbackYears:lookbackYears})}
+var lbEl=document.getElementById('lookbackYears');if(lbEl)lbEl.value=lookbackYears;
+updateYearUI();buildAll();applyPermissions();setSync('local','📱 تم الضبط');showToast('تم إعادة ضبط البيانات بنجاح','success');
+};
+
 window.exportExcel=function(type){if(typeof XLSX==='undefined'){showToast('مكتبة Excel غير محملة','error');return}var tableId='',fileName='';if(type==='forecast'){tableId='forecast-table';fileName='التنبؤ_'+targetYear}else if(type==='hist'){tableId='hist-table';fileName='البيانات_التاريخية'}else if(type==='variance'){tableId='variance-table';fileName='الانحرافات_'+targetYear}else if(type==='comp'){tableId='comp-table';fileName='المقارنة_السنوية'}else return;var table=document.getElementById(tableId);if(!table){showToast('لا يوجد جدول','error');return}var wb=XLSX.utils.book_new();var ws=XLSX.utils.table_to_sheet(table);ws['!cols']=[];for(var i=0;i<20;i++)ws['!cols'].push({wch:18});XLSX.utils.book_append_sheet(wb,ws,'بيانات');XLSX.writeFile(wb,fileName+'.xlsx');showToast('تم تصدير الملف','success')};
 
 window.handleLogin=function(){var u=document.getElementById('username').value.trim(),p=document.getElementById('password').value;document.getElementById('login-error').style.display='none';if(dbUsers[u]&&dbUsers[u].password===p){currentUser={password:dbUsers[u].password,role:dbUsers[u].role,name:dbUsers[u].name,username:u};document.getElementById('login-screen').style.display='none';document.getElementById('app-container').style.display='block';var rl={admin:'مدير',editor:'محرر',viewer:'مشاهد'},rc='role-'+currentUser.role+'-small';document.getElementById('user-badge').innerHTML='👤 '+currentUser.name+' <span class="role-badge-small '+rc+'">'+rl[currentUser.role]+'</span>';updateYearUI();buildAll();applyPermissions();setSync('local','📱 محلي');syncDataFromCloud()}else{document.getElementById('login-error').style.display='block'}};
@@ -356,71 +364,150 @@ window.handleLogout=function(){currentUser=null;document.getElementById('app-con
 
 window.jumpToSection=function(s){var c=document.getElementById('forecast-table-container');if(s==='top'){c.scrollTo({top:0,behavior:'smooth'});return}var el=document.getElementById(s);if(el)el.scrollIntoView({behavior:'smooth',block:'center'})};
 
-function ensembleForecast(arr,mi){var Y=arr.filter(function(v){return v!==0});if(Y.length<3)return Math.round(Y.length>0?Y[Y.length-1]:0);var N=Y.length,X=[];for(var i=0;i<N;i++)X.push(i+1);var sx=0,sy=0,sxy=0,sx2=0;for(var i=0;i<N;i++){sx+=X[i];sy+=Y[i];sxy+=X[i]*Y[i];sx2+=X[i]*X[i]}var b=(N*sxy-sx*sy)/(N*sx2-sx*sx),a=(sy-b*sx)/N;var lrF=a+b*(N+mi+1),l3=Y.slice(-3),maF=(l3[0]+l3[1]+l3[2])/3;var m1=arr[mi]||sy/N,m2=arr[mi+12]||sy/N;var sIdx=((m1+m2)/2)/(sy/24),sF=lrF*sIdx;return Math.round(W_MA*maF+W_LR*lrF+W_SEASONAL*sF)}
-function getForecastValue(acc,mi){var k1='y'+(targetYear-1),k2='y'+(targetYear-2);var p1=acc.hist[k1]||Array(12).fill(0),p2=acc.hist[k2]||Array(12).fill(0);if(acc.forecastType==='fixed')return Math.round(p1.reduce(function(a,b){return a+b},0)/12);return ensembleForecast(p2.concat(p1),mi)}
+/* ===== خوارزميات التنبؤ الديناميكية ===== */
+function ensembleForecast(arr, mi){
+    var Y=arr.filter(function(v){return v!==0});
+    if(Y.length<3)return Math.round(Y.length>0?Y[Y.length-1]:0);
+    var N=Y.length,X=[];
+    for(var i=0;i<N;i++)X.push(i+1);
+    var sx=0,sy=0,sxy=0,sx2=0;
+    for(var i=0;i<N;i++){sx+=X[i];sy+=Y[i];sxy+=X[i]*Y[i];sx2+=X[i]*X[i]}
+    var b=(N*sxy-sx*sy)/(N*sx2-sx*sx),a=(sy-b*sx)/N;
+    var lrF=a+b*(N+mi+1),l3=Y.slice(-3),maF=(l3[0]+l3[1]+l3[2])/3;
+    /* حساب الموسمية الديناميكي (يعمل مع أي عدد من السنوات) */
+    var totalMonths=arr.length;
+    var numYears=Math.floor(totalMonths/12);
+    var seasonalSum=0,seasonCount=0;
+    for(var y=0;y<numYears;y++){
+        var val=arr[mi+y*12];
+        if(val){seasonalSum+=val;seasonCount++}
+    }
+    var mAvg=seasonCount>0?(seasonalSum/seasonCount):(sy/N);
+    var sIdx=(sy/N)>0?(mAvg/(sy/N)):1;
+    var sF=lrF*sIdx;
+    return Math.round(W_MA*maF+W_LR*lrF+W_SEASONAL*sF);
+}
 
-window.updateWeightsUI=function(){var ma=parseFloat(document.getElementById('weightMA').value)||0,lr=parseFloat(document.getElementById('weightLR').value)||0,se=parseFloat(document.getElementById('weightSeasonal').value)||0;var t=ma+lr+se;if(t===0)t=1;document.getElementById('actualMA').innerText=(ma/t*100).toFixed(1)+'%';document.getElementById('actualLR').innerText=(lr/t*100).toFixed(1)+'%';document.getElementById('actualSeasonal').innerText=(se/t*100).toFixed(1)+'%'};
-window.applyWeightsAndRecalc=function(){if(!canDo('change_weights')){showToast('لا صلاحية','error');return}var ma=parseFloat(document.getElementById('weightMA').value)||0,lr=parseFloat(document.getElementById('weightLR').value)||0,se=parseFloat(document.getElementById('weightSeasonal').value)||0;var t=ma+lr+se;if(t===0){showToast('الأوزان صفر','error');return}W_MA=ma/t;W_LR=lr/t;W_SEASONAL=se/t;accounts.forEach(function(acc){if(!acc.forecast)acc.forecast={};acc.forecast['y'+targetYear]=[];for(var i=0;i<12;i++)acc.forecast['y'+targetYear].push(getForecastValue(acc,i))});buildAll();applyPermissions();saveAccounts();showToast('تم حساب التنبؤات','success')};
+function getForecastValue(acc, mi) {
+    /* 1. جمع كل السنوات التاريخية المتاحة قبل سنة التنبؤ */
+    var histYears = Object.keys(acc.hist)
+        .filter(function(k) { return k.startsWith('y') && acc.hist[k] && Array.isArray(acc.hist[k]) })
+        .map(function(k) { return parseInt(k.replace('y', '')) })
+        .filter(function(y) { return y < targetYear })
+        .sort(function(a, b) { return a - b });
 
-window.addItem=async function(){if(!canDo('add_item'))return;var n=document.getElementById('newName').value.trim(),g=document.getElementById('newGroup').value,t=document.getElementById('newType').value;if(!n){showToast('أدخل اسم البند','error');return}var exists=accounts.some(function(a){return a.name.trim()===n});if(exists){showToast('يوجد بند بنفس الاسم!','error');return}var newId='c_'+Date.now()+'_'+Math.random().toString(36).substr(2,5);accounts.push({id:newId,name:n,group:g,type:'cost',forecastType:t,isSystem:false,hist:{}});document.getElementById('newName').value='';await saveAccounts();buildAll();applyPermissions();showToast('تمت الإضافة','success')};
+    /* 2. أخذ عدد السنوات الذي حدده المستخدم */
+    var recentYears = histYears.slice(-lookbackYears);
+
+    if (recentYears.length === 0) return 0;
+
+    /* 3. إذا كان البند ثابتاً، نحسب المتوسط بناءً على آخر سنة متاحة */
+    if (acc.forecastType === 'fixed') {
+        var lastYear = recentYears[recentYears.length - 1];
+        var lastYearData = acc.hist['y' + lastYear];
+        return Math.round(lastYearData.reduce(function(a, b) { return a + b }, 0) / 12);
+    }
+
+    /* 4. دمج بيانات السنوات المحددة في مصفوفة واحدة متسلسلة زمنياً */
+    var fullHistory = [];
+    recentYears.forEach(function(y) {
+        var yearData = acc.hist['y' + y];
+        if (yearData && yearData.length === 12) {
+            fullHistory = fullHistory.concat(yearData);
+        }
+    });
+
+    if (fullHistory.length === 0) return 0;
+
+    /* 5. تطبيق خوارزميات التنبؤ */
+    return ensembleForecast(fullHistory, mi);
+}
+
+window.updateWeightsUI=function(){
+var ma=parseFloat(document.getElementById('weightMA').value)||0,lr=parseFloat(document.getElementById('weightLR').value)||0,se=parseFloat(document.getElementById('weightSeasonal').value)||0;
+var t=ma+lr+se;if(t===0)t=1;
+document.getElementById('actualMA').innerText=(ma/t*100).toFixed(1)+'%';
+document.getElementById('actualLR').innerText=(lr/t*100).toFixed(1)+'%';
+document.getElementById('actualSeasonal').innerText=(se/t*100).toFixed(1)+'%';
+var lb=parseInt(document.getElementById('lookbackYears').value)||3;
+document.getElementById('actualLookback').innerText=lb+' سنوات';
+};
+
+window.applyWeightsAndRecalc=function(){
+if(!canDo('change_weights')){showToast('لا صلاحية','error');return}
+var ma=parseFloat(document.getElementById('weightMA').value)||0,lr=parseFloat(document.getElementById('weightLR').value)||0,se=parseFloat(document.getElementById('weightSeasonal').value)||0;
+var t=ma+lr+se;if(t===0){showToast('الأوزان صفر','error');return}
+W_MA=ma/t;W_LR=lr/t;W_SEASONAL=se/t;
+lookbackYears=parseInt(document.getElementById('lookbackYears').value)||3;
+if(lookbackYears<1)lookbackYears=1;
+accounts.forEach(function(acc){if(!acc.forecast)acc.forecast={};acc.forecast['y'+targetYear]=[];for(var i=0;i<12;i++)acc.forecast['y'+targetYear].push(getForecastValue(acc,i))});
+buildAll();applyPermissions();saveAccounts();saveSettings();
+showToast('تم حساب التنبؤات (آخر '+lookbackYears+' سنوات)','success');
+};
+
+window.addItem=async function(){if(!canDo('add_item'))return;var n=document.getElementById('newName').value.trim(),g=document.getElementById('newGroup').value,t=document.getElementById('newType').value;if(!n){showToast('أدخل اسم البند','error');return}
+var exists=accounts.some(function(a){return a.name.trim()===n});if(exists){showToast('يوجد بند بنفس الاسم!','error');return}
+var newId='c_'+Date.now()+'_'+Math.random().toString(36).substr(2,5);
+accounts.push({id:newId,name:n,group:g,type:'cost',forecastType:t,isSystem:false,hist:{}});document.getElementById('newName').value='';await saveAccounts();buildAll();applyPermissions();showToast('تمت الإضافة','success')};
 window.deleteItem=async function(id){if(!canDo('delete_item'))return;if(!confirm('حذف هذا البند؟'))return;accounts=accounts.filter(function(a){return a.id!==id});await saveAccounts();buildAll();applyPermissions()};
 
-/* ===== بناء جدول التنبؤ بالهيكل الجديد ===== */
 function buildForecastTable(){
 var h='';
 accounts.filter(function(a){return a.group==='rev'}).forEach(function(a){h+=makeRow(a,'row-rev')});
 h+=makeTotalRow('section-rev','إجمالي الإيرادات','rev');
 accounts.filter(function(a){return a.group==='cogs'}).forEach(function(a){h+=makeRow(a,'row-cogs')});
 h+=makeTotalRow('section-cogs','إجمالي تكلفة البضاعة','cogs');
-h+='<tr id="section-gross" class="row-profit"><td class="bold-text forecast-sticky-name">مجمل الربح</td>';months.forEach(function(m){h+='<td class="input-total" id="gross_'+m+'"></td>'});h+='<td class="input-total forecast-sticky-total" id="gross_sum"></td></tr>';
-
-/* === قسم التكاليف التشغيلية والتسويقية === */
-h+='<tr id="section-opexmkt" class="row-title"><td class="forecast-sticky-name" style="font-size:15px">⚙️ التكاليف التشغيلية والتسويقية</td><td colspan="13"></td></tr>';
-h+='<tr class="row-sub-title"><td class="forecast-sticky-name" style="padding-right:20px">🔧 تشغيلية أخري</td><td colspan="13"></td></tr>';
+h+='<tr id="section-gross" class="row-profit"><td class="bold-text forecast-sticky-name">مجمل الربح</td>';
+months.forEach(function(m){h+='<td class="input-total" id="gross_'+m+'"></td>'});
+h+='<td class="input-total forecast-sticky-total" id="gross_sum"></td></tr>';
 accounts.filter(function(a){return a.group==='opex_other'}).forEach(function(a){h+=makeRow(a,'row-opex')});
-h+=makeTotalRow('section-opex','إجمالي التكاليف التشغيلية الأخري','opex_other');
-
-h+='<tr class="row-sub-title"><td class="forecast-sticky-name" style="padding-right:20px">📢 تسويقية</td><td colspan="13"></td></tr>';
+h+=makeTotalRow('section-opex','إجمالي التشغيلية','opex_other');
 accounts.filter(function(a){return a.group==='marketing'}).forEach(function(a){h+=makeRow(a,'row-marketing')});
-h+=makeTotalRow('section-mkt','إجمالي التكاليف التسويقية','marketing');
-
-/* إجمالي التشغيلية والتسويقية */
-h+=makeTotalRow('section-opexmkt-total','إجمالي التشغيلية والتسويقية','opexmkt',true);
-
-/* === قسم التكاليف الإدارية === */
+h+=makeTotalRow('section-marketing','إجمالي التسويقية','marketing');
+h+='<tr id="section-admin" class="row-total"><td class="bold-text forecast-sticky-name">⚙️ التكاليف التشغيلية والتسويقية</td>';
+months.forEach(function(m){h+='<td class="input-total" id="total_opexmkt_'+m+'"></td>'});
+h+='<td class="input-total forecast-sticky-total" id="total_opexmkt_sum"></td></tr>';
 accounts.filter(function(a){return a.group==='admin'}).forEach(function(a){h+=makeRow(a,'row-admin')});
-h+=makeTotalRow('section-admin','إجمالي التكاليف الإدارية','admin');
-
-/* === صافي الربح === */
-h+='<tr id="section-net" class="row-profit"><td class="bold-text forecast-sticky-name">صافي الربح</td>';months.forEach(function(m){h+='<td class="input-total" id="net_'+m+'"></td>'});h+='<td class="input-total forecast-sticky-total" id="net_sum"></td></tr>';
-
+h+=makeTotalRow('section-admin2','إجمالي الإدارية','admin');
+h+='<tr id="section-net" class="row-profit"><td class="bold-text forecast-sticky-name">صافي الربح</td>';
+months.forEach(function(m){h+='<td class="input-total" id="net_'+m+'"></td>'});
+h+='<td class="input-total forecast-sticky-total" id="net_sum"></td></tr>';
 document.getElementById('forecastBody').innerHTML=h;calculateTotals();
 }
 
-function makeRow(acc,cls){var tag=acc.forecastType==='fixed'?'<span class="tag tag-fixed">ثابت</span>':'<span class="tag tag-seasonal">موسمي</span>';var fArr=(acc.forecast&&acc.forecast['y'+targetYear])?acc.forecast['y'+targetYear]:Array(12).fill(0);var h='<tr class="'+cls+'"><td class="forecast-sticky-name">'+tag+' '+acc.name+'</td>';for(var i=0;i<12;i++)h+='<td><input type="text" inputmode="numeric" class="input-forecast num-input" id="'+acc.id+'_'+months[i]+'" value="'+fmt(fArr[i])+'" readonly></td>';h+='<td class="forecast-sticky-total" id="sum_'+acc.id+'"></td></tr>';return h}
+function makeRow(acc,cls){
+var tag=acc.forecastType==='fixed'?'<span class="tag tag-fixed">ثابت</span>':'<span class="tag tag-seasonal">موسمي</span>';
+var fArr=(acc.forecast&&acc.forecast['y'+targetYear])?acc.forecast['y'+targetYear]:Array(12).fill(0);
+var h='<tr class="'+cls+'"><td class="forecast-sticky-name">'+tag+' '+acc.name+'</td>';
+for(var i=0;i<12;i++)h+='<td><input type="number" class="input-forecast" id="'+acc.id+'_'+months[i]+'" value="'+fArr[i]+'" readonly></td>';
+h+='<td class="forecast-sticky-total" id="sum_'+acc.id+'"></td></tr>';return h;
+}
 
-function makeTotalRow(id,label,grp,isBold){
-var borderStyle=isBold?'border-top:3px solid var(--gray-400)':'';
-var h='<tr id="'+id+'" class="row-total" style="'+borderStyle+'"><td class="bold-text forecast-sticky-name">'+label+'</td>';
+function makeTotalRow(id,label,grp){
+var h='<tr id="'+id+'" class="row-total"><td class="bold-text forecast-sticky-name">'+label+'</td>';
 months.forEach(function(m){h+='<td class="input-total" id="total_'+grp+'_'+m+'"></td>'});
-h+='<td class="input-total forecast-sticky-total" id="total_'+grp+'_sum"></td></tr>';return h}
+h+='<td class="input-total forecast-sticky-total" id="total_'+grp+'_sum"></td></tr>';return h;
+}
 
-/* ===== حساب الإجماليات بالهيكل الجديد ===== */
 function calculateTotals(){
-accounts.forEach(function(acc){var total=0;months.forEach(function(m){var el=document.getElementById(acc.id+'_'+m);total+=el?parseNum(el.value):0});var se=document.getElementById('sum_'+acc.id);if(se)se.innerText=fmt(total)});
-var groupSums={rev:0,cogs:0,opex_other:0,marketing:0,admin:0};
+var s={rev:0,cogs:0,opex_other:0,marketing:0,admin:0};
 months.forEach(function(m){
-var gVals={rev:0,cogs:0,opex_other:0,marketing:0,admin:0};
-accounts.forEach(function(acc){var el=document.getElementById(acc.id+'_'+m);var val=el?parseNum(el.value):0;if(acc.group==='rev')gVals.rev+=val;else if(acc.group==='cogs')gVals.cogs+=val;else if(acc.group==='opex_other')gVals.opex_other+=val;else if(acc.group==='marketing')gVals.marketing+=val;else if(acc.group==='admin')gVals.admin+=val});
-['rev','cogs','opex_other','marketing','admin'].forEach(function(g){var el=document.getElementById('total_'+g+'_'+m);if(el)el.innerText=fmt(gVals[g]);groupSums[g]+=gVals[g]});
-var gross=gVals.rev-gVals.cogs;var grossEl=document.getElementById('gross_'+m);if(grossEl)grossEl.innerText=fmt(gross);
-var opexmkt=gVals.opex_other+gVals.marketing;var opexmktEl=document.getElementById('total_opexmkt_'+m);if(opexmktEl)opexmktEl.innerText=fmt(opexmkt);
-var net=gross-opexmkt-gVals.admin;var netEl=document.getElementById('net_'+m);if(netEl)netEl.innerText=fmt(net);
+var r=0,c=0,o=0,mk=0,a=0;
+accounts.forEach(function(acc){
+var el=document.getElementById(acc.id+'_'+m);var val=el?(parseFloat(el.value)||0):0;
+if(acc.group==='rev')r+=val;else if(acc.group==='cogs')c+=val;else if(acc.group==='opex_other')o+=val;else if(acc.group==='marketing')mk+=val;else if(acc.group==='admin')a+=val;
+var se=document.getElementById('sum_'+acc.id);if(se){var rs=0;months.forEach(function(mm){var e=document.getElementById(acc.id+'_'+mm);rs+=e?(parseFloat(e.value)||0):0});se.innerText=fmt(rs)}
 });
-var grossSum=groupSums.rev-groupSums.cogs;var opexmktSum=groupSums.opex_other+groupSums.marketing;var netSum=grossSum-opexmktSum-groupSums.admin;
-var sumEls={'total_rev_sum':groupSums.rev,'total_cogs_sum':groupSums.cogs,'gross_sum':grossSum,'total_opex_other_sum':groupSums.opex_other,'total_marketing_sum':groupSums.marketing,'total_opexmkt_sum':opexmktSum,'total_admin_sum':groupSums.admin,'net_sum':netSum};
+['rev','cogs','opex_other','marketing','admin'].forEach(function(g){var el=document.getElementById('total_'+g+'_'+m);if(el)el.innerText=fmt(eval(g))});
+s.rev+=r;s.cogs+=c;s.opex_other+=o;s.marketing+=mk;s.admin+=a;
+var gross=r-c;var grossEl=document.getElementById('gross_'+m);if(grossEl)grossEl.innerText=fmt(gross);
+var opexmkt=o+mk;var opexmktEl=document.getElementById('total_opexmkt_'+m);if(opexmktEl)opexmktEl.innerText=fmt(opexmkt);
+var net=gross-opexmkt-a;var netEl=document.getElementById('net_'+m);if(netEl)netEl.innerText=fmt(net);
+});
+var grossSum=s.rev-s.cogs;var opexmktSum=s.opex_other+s.marketing;var netSum=grossSum-opexmktSum-s.admin;
+var sumEls={'total_rev_sum':s.rev,'total_cogs_sum':s.cogs,'gross_sum':grossSum,'total_opex_other_sum':s.opex_other,'total_marketing_sum':s.marketing,'total_opexmkt_sum':opexmktSum,'total_admin_sum':s.admin,'net_sum':netSum};
 Object.keys(sumEls).forEach(function(id){var el=document.getElementById(id);if(el)el.innerText=fmt(sumEls[id])});
-document.getElementById('sumRev').innerText=fmt(groupSums.rev);document.getElementById('sumGross').innerText=fmt(grossSum);document.getElementById('sumNet').innerText=fmt(netSum);
+document.getElementById('sumRev').innerText=fmt(s.rev);document.getElementById('sumGross').innerText=fmt(grossSum);document.getElementById('sumNet').innerText=fmt(netSum);
 }
 
 function buildMonthCheckboxes(){var container=document.getElementById('month-checkboxes');if(!container)return;var h='';for(var i=0;i<12;i++){h+='<label class="month-cb-label" id="mcl_'+i+'"><input type="checkbox" class="month-cb" value="'+i+'" onchange="window.onMonthCheckChange(this)">'+monthsAr[i]+'</label>'}container.innerHTML=h;var currentMonth=new Date().getMonth();var cb=container.querySelector('input[value="'+currentMonth+'"]');if(cb){cb.checked=true;updateMonthLabel(currentMonth,true)}}
@@ -434,7 +521,7 @@ window.selectQuarter=function(q){document.querySelectorAll('.month-cb').forEach(
 window.buildVarianceTable=function(){
 var selectedMonths=window.getSelectedMonths();var yKey='y'+targetYear;
 if(selectedMonths.length===0){document.getElementById('varianceBody').innerHTML='<tr><td colspan="6" style="text-align:center;padding:40px;color:var(--gray-600)">📅 اختر شهراً واحداً على الأقل</td></tr>';document.getElementById('variance-summary').innerHTML='';return}
-var groups=[{id:'rev',name:'الإيرادات',cls:'row-rev',isCost:false},{id:'cogs',name:'تكلفة البضاعة',cls:'row-cogs',isCost:true},{id:'opex_other',name:'التكاليف التشغيلية الأخري',cls:'row-opex',isCost:true},{id:'marketing',name:'التكاليف التسويقية',cls:'row-marketing',isCost:true},{id:'admin',name:'التكاليف الإدارية',cls:'row-admin',isCost:true}];
+var groups=[{id:'rev',name:'الإيرادات',cls:'row-rev',isCost:false},{id:'cogs',name:'تكلفة البضاعة',cls:'row-cogs',isCost:true},{id:'opex_other',name:'التكاليف التشغيلية',cls:'row-opex',isCost:true},{id:'marketing',name:'التكاليف التسويقية',cls:'row-marketing',isCost:true},{id:'admin',name:'التكاليف الإدارية',cls:'row-admin',isCost:true}];
 var h='';
 groups.forEach(function(grp){
 var grpF=0,grpA=0;
@@ -445,7 +532,7 @@ if(selectedMonths.length===1){
 var mi=selectedMonths[0];var fVal=(acc.forecast&&acc.forecast[yKey])?acc.forecast[yKey][mi]:0;var aVal=(acc.hist[yKey]&&acc.hist[yKey][mi])?acc.hist[yKey][mi]:0;
 var diff=aVal-fVal,pct=fVal!==0?(diff/Math.abs(fVal)*100):0;var dc='',pc='pct-neutral',pt='—';
 if(aVal!==0){dc=(grp.isCost?(diff<0?'positive':'negative'):(diff>0?'positive':'negative'));pc=dc==='positive'?'pct-good':'pct-bad';pt=pct.toFixed(1)+'%'}
-h+='<tr class="'+grp.cls+'"><td style="text-align:right;font-weight:700">'+acc.name+'</td><td class="var-month-cell">'+monthsAr[mi]+'</td><td class="var-forecast num-cell">'+fmt(fVal)+'</td><td><input type="text" inputmode="numeric" class="var-actual-input num-input" value="'+(aVal?fmt(aVal):'')+'" placeholder="أدخل الفعلي" oninput="formatInput(this)" onchange="window.saveActualValue(\''+acc.id+'\','+mi+',this.value)"></td><td class="var-diff '+dc+' num-cell">'+(aVal!==0?fmt(diff):'—')+'</td><td><span class="var-pct '+pc+'">'+pt+'</span></td></tr>';
+h+='<tr class="'+grp.cls+'"><td style="text-align:right;font-weight:700">'+acc.name+'</td><td class="var-month-cell">'+monthsAr[mi]+'</td><td class="var-forecast num-cell">'+fmt(fVal)+'</td><td><input type="text" inputmode="numeric" class="var-actual-input" value="'+(aVal?fmt(aVal):'')+'" placeholder="أدخل الفعلي" oninput="formatInput(this)" onchange="window.saveActualValue(\''+acc.id+'\','+mi+',this.value)"></td><td class="var-diff '+dc+' num-cell">'+(aVal!==0?fmt(diff):'—')+'</td><td><span class="var-pct '+pc+'">'+pt+'</span></td></tr>';
 grpF+=fVal;grpA+=aVal;
 }else{
 var accTotalF=0,accTotalA=0;
@@ -453,7 +540,7 @@ selectedMonths.forEach(function(mi){
 var fVal=(acc.forecast&&acc.forecast[yKey])?acc.forecast[yKey][mi]:0;var aVal=(acc.hist[yKey]&&acc.hist[yKey][mi])?acc.hist[yKey][mi]:0;
 var diff=aVal-fVal,pct=fVal!==0?(diff/Math.abs(fVal)*100):0;var dc='',pc='pct-neutral',pt='—';
 if(aVal!==0){dc=(grp.isCost?(diff<0?'positive':'negative'):(diff>0?'positive':'negative'));pc=dc==='positive'?'pct-good':'pct-bad';pt=pct.toFixed(1)+'%'}
-h+='<tr class="'+grp.cls+'"><td style="text-align:right;font-weight:700;padding-right:24px">'+acc.name+'</td><td class="var-month-cell">'+monthsAr[mi]+'</td><td class="var-forecast num-cell">'+fmt(fVal)+'</td><td><input type="text" inputmode="numeric" class="var-actual-input num-input" style="width:110px!important;font-size:13px!important;padding:7px!important" value="'+(aVal?fmt(aVal):'')+'" placeholder="الفعلي" oninput="formatInput(this)" onchange="window.saveActualValue(\''+acc.id+'\','+mi+',this.value)"></td><td class="var-diff '+dc+' num-cell">'+(aVal!==0?fmt(diff):'—')+'</td><td><span class="var-pct '+pc+'">'+pt+'</span></td></tr>';
+h+='<tr class="'+grp.cls+'"><td style="text-align:right;font-weight:700;padding-right:24px">'+acc.name+'</td><td class="var-month-cell">'+monthsAr[mi]+'</td><td class="var-forecast num-cell">'+fmt(fVal)+'</td><td><input type="text" inputmode="numeric" class="var-actual-input" style="width:110px!important;font-size:13px!important;padding:7px!important" value="'+(aVal?fmt(aVal):'')+'" placeholder="الفعلي" oninput="formatInput(this)" onchange="window.saveActualValue(\''+acc.id+'\','+mi+',this.value)"></td><td class="var-diff '+dc+' num-cell">'+(aVal!==0?fmt(diff):'—')+'</td><td><span class="var-pct '+pc+'">'+pt+'</span></td></tr>';
 accTotalF+=fVal;accTotalA+=aVal;
 });
 var totalDiff=accTotalA-accTotalF;var totalPct=accTotalF!==0?(totalDiff/Math.abs(accTotalF)*100):0;
@@ -478,7 +565,8 @@ summaryHtml+='<div class="variance-summary-chip" style="border-top:3px solid '+(
 document.getElementById('variance-summary').innerHTML=summaryHtml;checkRollover();
 };
 
-window.saveActualValue=async function(accId,mi,value){if(!canDo('edit_data')){showToast('لا صلاحية','error');return}var acc=accounts.find(function(a){return a.id===accId});if(acc){var yKey='y'+targetYear;if(!acc.hist[yKey])acc.hist[yKey]=Array(12).fill(0);acc.hist[yKey][mi]=parseNum(value);await saveAccounts();window.buildVarianceTable()}};
+function formatInput(el){el.value=el.value.replace(/[^0-9]/g,'')}
+window.saveActualValue=async function(accId,mi,value){if(!canDo('edit_data')){showToast('لا صلاحية','error');return}var acc=accounts.find(function(a){return a.id===accId});if(acc){var yKey='y'+targetYear;if(!acc.hist[yKey])acc.hist[yKey]=Array(12).fill(0);acc.hist[yKey][mi]=parseFloat(value.replace(/,/g,''))||0;await saveAccounts();window.buildVarianceTable()}};
 function checkRollover(){var yKey='y'+targetYear;var hasDec=accounts.some(function(a){return a.hist[yKey]&&a.hist[yKey][11]>0});var sec=document.getElementById('rollover-section');if(hasDec){sec.style.display='block';document.getElementById('rollover-current-year').innerText=targetYear;document.getElementById('rollover-next-year').innerText=targetYear+1}else{sec.style.display='none'}}
 window.rollOverYear=async function(){if(!confirm('إغلاق سنة '+targetYear+' والتنبؤ لسنة '+(targetYear+1)+'؟'))return;targetYear++;accounts.forEach(function(acc){if(!acc.forecast)acc.forecast={};acc.forecast['y'+targetYear]=[];for(var i=0;i<12;i++)acc.forecast['y'+targetYear].push(getForecastValue(acc,i))});await saveSettings();await saveAccounts();updateYearUI();buildAll();applyPermissions();buildMonthCheckboxes();window.buildVarianceTable();showToast('تم إنشاء تنبؤ لسنة '+targetYear,'success')};
 
@@ -493,19 +581,19 @@ accounts.filter(function(a){return a.group===g}).forEach(function(acc){
 var histData=acc.hist['y'+y];if(!histData&&y===targetYear){acc.hist['y'+y]=Array(12).fill(0);histData=acc.hist['y'+y]}if(!histData)return;
 var isCurrentYear=(y===targetYear);var yearLabel=y+(isCurrentYear?' ⚡فعلي':'');
 h+='<tr class="'+gc[g]+(isCurrentYear?' row-current-actual':'')+'"><td class="hist-sticky-1">'+(!acc.isSystem?'<button class="btn btn-delete" onclick="window.deleteItem(\''+acc.id+'\')">حذف</button>':'')+'</td><td class="hist-sticky-2">'+acc.name+'</td><td class="hist-sticky-3">'+yearLabel+'</td>';
-histData.forEach(function(v,i){h+='<td><input type="text" inputmode="numeric" class="input-hist num-input" value="'+fmt(v)+'" oninput="formatInput(this)" onchange="window.updateHist(\''+acc.id+'\',\'y'+y+'\','+i+',this.value)"></td>'});
+histData.forEach(function(v,i){h+='<td><input type="text" inputmode="numeric" class="input-hist" value="'+fmt(v)+'" oninput="formatInput(this)" onchange="window.updateHist(\''+acc.id+'\',\'y'+y+'\','+i+',this.value)"></td>'});
 h+='<td style="background:var(--gray-100);font-weight:800" class="num-cell">'+fmt(histData.reduce(function(a,b){return a+b},0))+'</td></tr>';
 })})});
 document.getElementById('histBody').innerHTML=h;
 }
 
-window.updateHist=async function(id,yk,i,v){if(!canDo('edit_data'))return;var a=accounts.find(function(x){return x.id===id});if(a){a.hist[yk][i]=parseNum(v);await saveAccounts();buildHistTable();applyPermissions();if(yk==='y'+targetYear){window.buildVarianceTable()}}};
+window.updateHist=async function(id,yk,i,v){if(!canDo('edit_data'))return;var a=accounts.find(function(x){return x.id===id});if(a){a.hist[yk][i]=parseFloat(v.replace(/,/g,''))||0;await saveAccounts();buildHistTable();applyPermissions()}};
 
 function updateCompTable(){
 var h='';function cn(y){return accounts.reduce(function(s,a){var v=a.hist['y'+y]?a.hist['y'+y].reduce(function(x,b){return x+b},0):0;if(a.group==='rev')return s+v;if(['cogs','opex_other','marketing','admin'].indexOf(a.group)!==-1)return s-v;return s},0)}
-function rg(g){accounts.filter(function(a){return a.group===g}).forEach(function(a){var s1=a.hist['y'+(targetYear-2)]?a.hist['y'+(targetYear-2)].reduce(function(x,b){return x+b},0):0;var s2=a.hist['y'+(targetYear-1)]?a.hist['y'+(targetYear-1)].reduce(function(x,b){return x+b},0):0;var se=document.getElementById('sum_'+a.id);var s3=se?parseNum(se.innerText):0;var c1=s1!==0?(s2-s1)/s1*100:0,c2=s2!==0?(s3-s2)/s2*100:0;h+='<tr><td class="comp-sticky-name">'+a.name+'</td><td class="num-cell">'+fmt(s1)+'</td><td class="num-cell">'+fmt(s2)+'</td><td style="font-weight:700;color:var(--primary)" class="num-cell">'+fmt(s3)+'</td><td class="'+(c1<0?'negative':'positive')+'">'+c1.toFixed(1)+'%</td><td class="'+(c2<0?'negative':'positive')+'">'+c2.toFixed(1)+'%</td></tr>'})}
+function rg(g){accounts.filter(function(a){return a.group===g}).forEach(function(a){var s1=a.hist['y'+(targetYear-2)]?a.hist['y'+(targetYear-2)].reduce(function(x,b){return x+b},0):0;var s2=a.hist['y'+(targetYear-1)]?a.hist['y'+(targetYear-1)].reduce(function(x,b){return x+b},0):0;var se=document.getElementById('sum_'+a.id);var s3=se?parseFloat(se.innerText.replace(/,/g,''))||0:0;var c1=s1!==0?(s2-s1)/s1*100:0,c2=s2!==0?(s3-s2)/s2*100:0;h+='<tr><td class="comp-sticky-name">'+a.name+'</td><td class="num-cell">'+fmt(s1)+'</td><td class="num-cell">'+fmt(s2)+'</td><td style="font-weight:700;color:var(--primary)" class="num-cell">'+fmt(s3)+'</td><td class="'+(c1<0?'negative':'positive')+'">'+c1.toFixed(1)+'%</td><td class="'+(c2<0?'negative':'positive')+'">'+c2.toFixed(1)+'%</td></tr>'})}
 ['rev','cogs','opex_other','marketing','admin'].forEach(function(g){rg(g)});
-var n1=cn(targetYear-2),n2=cn(targetYear-1),n3e=document.getElementById('net_sum'),n3=n3e?parseNum(n3e.innerText):0;
+var n1=cn(targetYear-2),n2=cn(targetYear-1),n3e=document.getElementById('net_sum'),n3=n3e?parseFloat(n3e.innerText.replace(/,/g,''))||0:0;
 var nc1=n1!==0?(n2-n1)/n1*100:0,nc2=n2!==0?(n3-n2)/n2*100:0;
 h+='<tr style="background:var(--success-light);font-weight:800;border-top:3px solid var(--success)"><td class="comp-sticky-name" style="background:var(--success-light)">صافي الربح</td><td class="num-cell">'+fmt(n1)+'</td><td class="num-cell">'+fmt(n2)+'</td><td style="color:var(--primary)" class="num-cell">'+fmt(n3)+'</td><td class="'+(nc1<0?'negative':'positive')+'">'+nc1.toFixed(1)+'%</td><td class="'+(nc2<0?'negative':'positive')+'">'+nc2.toFixed(1)+'%</td></tr>';
 document.getElementById('compBody').innerHTML=h;
@@ -523,6 +611,7 @@ breakdownChartInstance=new Chart(c2,{type:'bar',data:{labels:[targetYear-2+'',ta
 function cr(n,d){return d===0?'0%':(n/d*100).toFixed(1)+'%'}
 document.getElementById('ratiosGrid').innerHTML='<div class="ratio-card"><h4>هامش مجمل الربح</h4><div class="ratio-values"><div class="ratio-year"><label>'+(targetYear-2)+'</label><span>'+cr(d1.gross,d1.rev)+'</span></div><div class="ratio-year"><label>'+(targetYear-1)+'</label><span>'+cr(d2.gross,d2.rev)+'</span></div><div class="ratio-year highlight"><label>'+targetYear+'</label><span>'+cr(d3.gross,d3.rev)+'</span></div></div></div><div class="ratio-card"><h4>هامش صافي الربح</h4><div class="ratio-values"><div class="ratio-year"><label>'+(targetYear-2)+'</label><span>'+cr(d1.net,d1.rev)+'</span></div><div class="ratio-year"><label>'+(targetYear-1)+'</label><span>'+cr(d2.net,d2.rev)+'</span></div><div class="ratio-year highlight"><label>'+targetYear+'</label><span>'+cr(d3.net,d3.rev)+'</span></div></div></div><div class="ratio-card"><h4>نسبة تكلفة البضاعة</h4><div class="ratio-values"><div class="ratio-year"><label>'+(targetYear-2)+'</label><span>'+cr(d1.cogs,d1.rev)+'</span></div><div class="ratio-year"><label>'+(targetYear-1)+'</label><span>'+cr(d2.cogs,d2.rev)+'</span></div><div class="ratio-year highlight"><label>'+targetYear+'</label><span>'+cr(d3.cogs,d3.rev)+'</span></div></div></div><div class="ratio-card"><h4>نسبة التكاليف التسويقية</h4><div class="ratio-values"><div class="ratio-year"><label>'+(targetYear-2)+'</label><span>'+cr(d1.marketing,d1.rev)+'</span></div><div class="ratio-year"><label>'+(targetYear-1)+'</label><span>'+cr(d2.marketing,d2.rev)+'</span></div><div class="ratio-year highlight"><label>'+targetYear+'</label><span>'+cr(d3.marketing,d3.rev)+'</span></div></div></div>';
 }
+function parseNum(s){return parseFloat(String(s).replace(/,/g,''))||0}
 
 function buildUsersTable(){var h='',rl={admin:'مدير',editor:'محرر',viewer:'مشاهد'},rc={admin:'role-admin',editor:'role-editor',viewer:'role-viewer'};var keys=Object.keys(dbUsers);for(var k=0;k<keys.length;k++){var u=keys[k],usr=dbUsers[u],isCurr=(currentUser&&u===currentUser.username);var adminCount=0;var allKeys=Object.keys(dbUsers);for(var j=0;j<allKeys.length;j++){if(dbUsers[allKeys[j]].role==='admin')adminCount++}var isLast=(usr.role==='admin'&&adminCount<=1);h+='<tr class="'+(isCurr?'current-user-row':'')+'"><td style="font-weight:700">'+usr.name+'</td><td style="direction:ltr">'+u+'</td><td>';if(isCurr||isLast){h+='<span class="role-badge '+rc[usr.role]+'">'+rl[usr.role]+'</span>'}else{h+='<select class="role-select" onchange="window.changeUserRole(\''+u+'\',this.value)"><option value="admin"'+(usr.role==='admin'?' selected':'')+'>مدير</option><option value="editor"'+(usr.role==='editor'?' selected':'')+'>محرر</option><option value="viewer"'+(usr.role==='viewer'?' selected':'')+'>مشاهد</option></select>'}h+='</td><td><button class="btn-sm btn-password" onclick="window.openPasswordModal(\''+u+'\',\''+usr.name+'\')">🔑 كلمة المرور</button>';if(!isCurr&&!isLast)h+=' <button class="btn-sm btn-remove" onclick="window.deleteUser(\''+u+'\')">🗑️ حذف</button>';h+='</td></tr>'}document.getElementById('usersBody').innerHTML=h;document.getElementById('users-count').textContent=keys.length}
 
