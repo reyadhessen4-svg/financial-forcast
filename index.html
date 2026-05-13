@@ -61,12 +61,17 @@
         input:focus, select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); background: white; }
         .input-actual { background-color: var(--success-light) !important; font-weight: 600; }
         .input-forecast { background-color: var(--purple-light) !important; font-weight: 600; color: var(--purple); }
-        .input-hist { background-color: var(--warning-light) !important; }
+        .input-hist { background-color: transparent !important; } /* جعل خلفية الإدخال التاريخي شفافة لتبقى ألوان الصفوف ظاهرة */
         .input-total { background-color: var(--gray-100) !important; font-weight: 800; color: var(--gray-800); }
         input:disabled, select:disabled, button:disabled { opacity: 0.5; cursor: not-allowed !important; transform: none !important; box-shadow: none !important; background-color: var(--gray-100) !important; color: var(--gray-600) !important; border-color: transparent !important; }
         
-        tr:hover { background-color: var(--gray-50); }
-        .row-rev { background-color: #eff6ff; } .row-cogs { background-color: #fff1f2; } .row-opex { background-color: var(--warning-light); } .row-admin { background-color: #f0f9ff; }
+        /* تحسين ألوان الصفوف لتكون واضحة في التمرير */
+        tr.row-rev { background-color: #eff6ff; } 
+        tr.row-cogs { background-color: #fff1f2; } 
+        tr.row-opex { background-color: var(--warning-light); } 
+        tr.row-admin { background-color: #f0f9ff; }
+        tr.row-title { background-color: var(--gray-200); font-weight: 800; }
+
         .row-profit { background-color: var(--success-light); font-weight: bold; border-top: 2px solid var(--success); }
         .row-total { background-color: var(--gray-100); font-weight: bold; border-top: 2px solid var(--gray-300); } .bold-text { font-weight: 800; }
         .tag { font-size: 9px; padding: 2px 6px; border-radius: 12px; color: white; margin-left: 5px; display: inline-block; font-weight: 700; }
@@ -93,6 +98,20 @@
         .weight-group input[type="number"] { width: 70px; font-size: 18px; font-weight: 800; border: 1px solid var(--gray-300); border-radius: 6px; }
         .actual-weights { font-size: 11px; color: var(--primary); margin-top: 6px; font-weight: 700; }
         
+        /* ================= تحسين جدول البيانات التاريخية (Sticky Columns) ================= */
+        .hist-table-container { overflow: auto; max-height: 70vh; border: 1px solid var(--gray-200); border-radius: var(--radius); margin-bottom: 24px; box-shadow: var(--shadow-sm); }
+        .hist-table-container table { width: max-content; min-width: 100%; } /* السماح بالتمدد الأفقي */
+        
+        /* تثبيت الأعمدة الثلاثة الأولى (الإجراء، البيان، السنة) */
+        .hist-sticky-1 { position: sticky; right: 0; z-index: 12; min-width: 70px; background-color: inherit; border-left: 2px solid var(--gray-200); }
+        .hist-sticky-2 { position: sticky; right: 70px; z-index: 12; min-width: 180px; background-color: inherit; text-align: right !important; font-weight: 600; border-left: 2px solid var(--gray-200); }
+        .hist-sticky-3 { position: sticky; right: 250px; z-index: 12; min-width: 60px; background-color: inherit; font-weight: 700; border-left: 2px solid var(--gray-200); }
+        
+        /* تثبيت الرأس للأعمدة الثابتة */
+        th.hist-sticky-1 { background: var(--gray-800); right: 0; z-index: 15; }
+        th.hist-sticky-2 { background: var(--gray-800); right: 70px; z-index: 15; }
+        th.hist-sticky-3 { background: var(--gray-800); right: 250px; z-index: 15; }
+
         .charts-container { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
         @media (max-width: 900px) { .charts-container { grid-template-columns: 1fr; } }
         .chart-box { background: white; padding: 20px; border-radius: var(--radius); border: 1px solid var(--gray-200); box-shadow: var(--shadow-sm); }
@@ -108,7 +127,6 @@
 </head>
 <body>
 
-<!-- ================= شاشة تسجيل الدخول ================= -->
 <div id="login-screen">
     <div class="login-card">
         <div class="login-logo">🍔</div>
@@ -118,15 +136,10 @@
         <input type="password" id="password" class="login-input" placeholder="كلمة المرور">
         <button class="login-btn" onclick="window.handleLogin()">تسجيل الدخول</button>
         <div id="login-error" class="login-error">اسم المستخدم أو كلمة المرور غير صحيحة</div>
-        <div class="login-hint">
-            <strong>للتجربة:</strong><br>
-            مدير (صلاحية التعديل): admin / 1234<br>
-            مشاهد (قراءة فقط): viewer / 0000
-        </div>
+        <div class="login-hint"><strong>للتجربة:</strong><br> مدير: admin / 1234<br> مشاهد: viewer / 0000</div>
     </div>
 </div>
 
-<!-- ================= لوحة التحكم الرئيسية ================= -->
 <div id="app-container">
     <div class="app-header">
         <div class="app-brand">🍔 زاد الجود للوجبات السريعة</div>
@@ -162,6 +175,7 @@
         </div>
     </div>
 
+    <!-- شاشة البيانات التاريخية المحدثة -->
     <div id="tab2" class="tab-content">
         <h2>البيانات التاريخية الفعلية (2024 - 2025)</h2>
         <div class="add-form" id="add-form-ui">
@@ -171,8 +185,20 @@
             <select id="newType" style="border:1px solid var(--gray-300); width:120px;"><option value="seasonal">موسمي</option><option value="fixed">ثابت</option></select>
             <button class="btn btn-add" onclick="window.addItem()">+ إضافة وحفظ</button>
         </div>
-        <div class="table-container" style="overflow-x: auto; max-height: 60vh;">
-            <table><thead><tr><th>إجراء</th><th>البيان</th><th>السنة</th><th>يناير</th><th>فبراير</th><th>مارس</th><th>أبريل</th><th>مايو</th><th>يونيو</th><th>يوليو</th><th>أغسطس</th><th>سبتمبر</th><th>أكتوبر</th><th>نوفمبر</th><th>ديسمبر</th><th style="background:var(--gray-600)">الإجمالي</th></tr></thead><tbody id="histBody"></tbody></table>
+        <div class="hist-table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="hist-sticky-1">إجراء</th>
+                        <th class="hist-sticky-2">البيان</th>
+                        <th class="hist-sticky-3">السنة</th>
+                        <th>يناير</th><th>فبراير</th><th>مارس</th><th>أبريل</th><th>مايو</th><th>يونيو</th>
+                        <th>يوليو</th><th>أغسطس</th><th>سبتمبر</th><th>أكتوبر</th><th>نوفمبر</th><th>ديسمبر</th>
+                        <th style="background:var(--gray-600)">الإجمالي</th>
+                    </tr>
+                </thead>
+                <tbody id="histBody"></tbody>
+            </table>
         </div>
     </div>
 
@@ -192,7 +218,6 @@
     </div>
 </div>
 
-<!-- ================= Firebase & App Logic ================= -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
   import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -210,7 +235,6 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  // --- Variables ---
   const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
   let W_MA = 0.30, W_LR = 0.30, W_SEASONAL = 0.40;
   let trendChartInstance = null, breakdownChartInstance = null;
@@ -227,23 +251,17 @@
 
   let accounts = JSON.parse(JSON.stringify(defaultAccounts)); 
 
-  // --- Firebase Functions ---
   async function loadDataFromFirebase() {
       document.getElementById('sync-status').innerText = '⏳ جاري التحميل...';
       try {
           const snapshot = await get(ref(db, 'accounts'));
-          if (snapshot.exists()) {
-              accounts = snapshot.val();
-          } else {
-              await saveDataToFirebase(); // Seed DB on first run
-          }
+          if (snapshot.exists()) { accounts = snapshot.val(); } else { await saveDataToFirebase(); }
           document.getElementById('sync-status').innerText = '☁️ متصل';
       } catch (error) {
           console.error("Firebase load error:", error);
           document.getElementById('sync-status').innerText = '⚠️ غير متصل (محلي)';
       }
-      buildAll();
-      applyPermissions();
+      buildAll(); applyPermissions();
   }
 
   async function saveDataToFirebase() {
@@ -257,14 +275,9 @@
       }
   }
 
-  function debouncedSave() {
-      clearTimeout(saveTimeout);
-      saveTimeout = setTimeout(() => saveDataToFirebase(), 1500);
-  }
+  function debouncedSave() { clearTimeout(saveTimeout); saveTimeout = setTimeout(() => saveDataToFirebase(), 1500); }
 
-  // --- Auth & Permissions ---
   const systemUsers = { admin: { password: '1234', role: 'admin', name: 'مدير النظام' }, viewer: { password: '0000', role: 'viewer', name: 'مستخدم للعرض فقط' } };
-  
   window.handleLogin = function() {
       const u = document.getElementById('username').value;
       const p = document.getElementById('password').value;
@@ -274,9 +287,7 @@
           document.getElementById('app-container').style.display = 'block';
           document.getElementById('user-badge').innerText = `👤 ${currentUser.name}`;
           loadDataFromFirebase();
-      } else {
-          document.getElementById('login-error').style.display = 'block';
-      }
+      } else { document.getElementById('login-error').style.display = 'block'; }
   }
   window.handleLogout = function() {
       currentUser = null; accounts = JSON.parse(JSON.stringify(defaultAccounts));
@@ -284,7 +295,6 @@
       document.getElementById('login-screen').style.display = 'flex';
       document.getElementById('username').value = ''; document.getElementById('password').value = '';
   }
-
   function applyPermissions() {
       const isViewer = currentUser?.role === 'viewer';
       setTimeout(() => {
@@ -296,7 +306,6 @@
       }, 100);
   }
 
-  // --- Forecast Logic ---
   function ensembleForecast(historicalArray, targetMonthIndex) {
       let Y = historicalArray.filter(v => v !== null && v !== 0);
       if(Y.length < 3) return Math.round(Y.length > 0 ? Y[Y.length-1] : 0);
@@ -387,8 +396,7 @@
       if(acc) {
           if(!acc.hist.y2026) acc.hist.y2026 = Array(12).fill(0);
           acc.hist.y2026[monthIndex] = parseFloat(value) || 0;
-          calculateTotals();
-          debouncedSave();
+          calculateTotals(); debouncedSave();
       }
   }
 
@@ -415,13 +423,19 @@
       document.getElementById("sumRev").innerText = sums.rev.toLocaleString(); document.getElementById("sumGross").innerText = sums.gross.toLocaleString(); document.getElementById("sumNet").innerText = sums.net.toLocaleString();
   }
 
+  // ================= جدول البيانات التاريخية المحدث (Sticky Columns) =================
   function buildHistTable() {
       let html = '';
+      const groupColors = { rev: 'row-rev', cogs: 'row-cogs', opex: 'row-opex', admin: 'row-admin' };
       const renderGroupHist = (groupId, title) => {
-          html += `<tr><td colspan="16" style="background:var(--gray-200); font-weight:800; text-align:right; color:var(--gray-800);">${title}</td></tr>`;
+          html += `<tr class="row-title"><td class="hist-sticky-1" style="background:var(--gray-200)"></td><td class="hist-sticky-2" style="background:var(--gray-200); text-align:right; color:var(--gray-800);">${title}</td><td class="hist-sticky-3" style="background:var(--gray-200)"></td><td colspan="13" style="background:var(--gray-200); text-align:right; color:var(--gray-800);"></td></tr>`;
           accounts.filter(a => a.group === groupId).forEach(acc => {
               [2024, 2025].forEach(year => {
-                  html += `<tr><td>${!acc.isSystem ? `<button class="btn btn-delete" onclick="window.deleteItem('${acc.id}')">حذف</button>` : ''}</td><td style="text-align:right; font-weight:600;">${acc.name}</td><td style="font-weight:700;">${year}</td>`;
+                  const rowClass = groupColors[groupId] || '';
+                  html += `<tr class="${rowClass}">`;
+                  html += `<td class="hist-sticky-1">${!acc.isSystem ? `<button class="btn btn-delete" onclick="window.deleteItem('${acc.id}')">حذف</button>` : ''}</td>`;
+                  html += `<td class="hist-sticky-2">${acc.name}</td>`;
+                  html += `<td class="hist-sticky-3">${year}</td>`;
                   acc.hist[`y${year}`].forEach((v, i) => { html += `<td><input type="number" class="input-hist" value="${v}" onchange="window.updateHist('${acc.id}', 'y${year}', ${i}, this.value)"></td>`; });
                   html += `<td style="background:var(--gray-100); font-weight:800;">${acc.hist[`y${year}`].reduce((a,b)=>a+b,0).toLocaleString()}</td></tr>`;
               });
@@ -430,6 +444,7 @@
       renderGroupHist('rev', 'الإيرادات'); renderGroupHist('cogs', 'تكاليف البضاعة'); renderGroupHist('opex', 'التكاليف التشغيلية'); renderGroupHist('admin', 'التكاليف الإدارية');
       document.getElementById("histBody").innerHTML = html;
   }
+  
   window.updateHist = async function(id, yKey, index, value) {
       let acc = accounts.find(a => a.id === id);
       if(acc) {
