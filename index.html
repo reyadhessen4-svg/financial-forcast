@@ -117,12 +117,12 @@ input.num-input{direction:ltr;text-align:center;font-variant-numeric:tabular-num
 <div class="login-card">
 <div class="login-logo">🍔</div>
 <div class="login-title">زاد الجود للوجبات السريعة</div>
-<div class="login-subtitle">نظام التنبؤ المالي المتقدم</div>
+<div class="login-subtitle"> التنبؤ المالي زاد الجود</div>
 <input type="text" id="username" class="login-input" placeholder="اسم المستخدم">
 <input type="password" id="password" class="login-input" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')window.handleLogin()">
 <button class="login-btn" onclick="window.handleLogin()">تسجيل الدخول</button>
 <div id="login-error" class="login-error">اسم المستخدم أو كلمة المرور غير صحيحة</div>
-<div class="login-hint"><strong>للتجربة:</strong><br>مدير: admin / 1234<br>مشاهد: viewer / 0000</div>
+<div class="login-hint"><strong></strong><br><br></div>
 </div>
 </div>
 
@@ -280,7 +280,7 @@ var W_MA=0.30,W_LR=0.30,W_SEASONAL=0.40;
 var trendChartInstance=null,breakdownChartInstance=null;
 var months=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
 var monthsAr=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
-var defaultUsers={admin:{password:'1234',role:'admin',name:'مدير النظام'},viewer:{password:'0000',role:'viewer',name:'مشاهد'}};
+var defaultUsers={Reyad:{password:'1234',role:'Reyad',name:'مدير النظام'},viewer:{password:'0000',role:'viewer',name:'مشاهد'}};
 var dbUsers=null;
 var defaultAccounts=[
 {id:'rev',name:'إيرادات النشاط',group:'rev',type:'revenue',forecastType:'seasonal',isSystem:true,hist:{y2024:[2286722,2361899,1769553,1419441,3105270,1841862,3014738,2810509,2424254,2968869,2505047,2999607],y2025:[3408295,3276475,1920708,3236267,4622174,3377130,5905022,5573789,6015802,6482907,5902119,5384580]}},
