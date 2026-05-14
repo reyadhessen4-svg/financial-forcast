@@ -6,6 +6,9 @@
 <title>نظام التنبؤ المالي - زاد الجود</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<!-- إضافة مكتبات التعامل بالتاريخ الهجري -->
+<script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/moment-hijri@2.1.2/moment-hijri.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
 <style>
 :root{--primary:#4f46e5;--primary-light:#eef2ff;--success:#10b981;--success-light:#ecfdf5;--warning:#f59e0b;--warning-light:#fffbeb;--danger:#ef4444;--danger-light:#fef2f2;--purple:#8b5cf6;--purple-light:#f5f3ff;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-300:#d1d5db;--gray-600:#4b5563;--gray-800:#1f2937;--radius:12px;--radius-sm:8px}
@@ -146,7 +149,8 @@ th.hist-sticky-1,th.hist-sticky-2,th.hist-sticky-3{background:var(--gray-800);z-
 <h3>⚖️ أوزان التنبؤ</h3>
 <div class="weight-group"><label>المتوسط المتحرك</label><input type="number" id="weightMA" value="30" min="0" max="100" oninput="window.updateWeightsUI()"><div class="actual-weights" id="actualMA">30%</div></div>
 <div class="weight-group"><label>الانحدار الخطي</label><input type="number" id="weightLR" value="30" min="0" max="100" oninput="window.updateWeightsUI()"><div class="actual-weights" id="actualLR">30%</div></div>
-<div class="weight-group"><label>الموسمية</label><input type="number" id="weightSeasonal" value="40" min="0" max="100" oninput="window.updateWeightsUI()"><div class="actual-weights" id="actualSeasonal">40%</div></div>
+<!-- تعديل اسم الموسمية لتوضيح أنها هجرية -->
+<div class="weight-group"><label>الموسمية (هجرية)</label><input type="number" id="weightSeasonal" value="40" min="0" max="100" oninput="window.updateWeightsUI()"><div class="actual-weights" id="actualSeasonal">40%</div></div>
 <div class="weight-group"><label>فترة النظر (سنوات)</label><input type="number" id="lookbackYears" value="3" min="1" max="10" oninput="window.updateWeightsUI()"><div class="actual-weights" id="actualLookback">3 سنوات</div></div>
 <button class="btn btn-apply" onclick="window.applyWeightsAndRecalc()">🔄 تطبيق وحفظ التنبؤ</button>
 </div>
@@ -172,7 +176,7 @@ th.hist-sticky-1,th.hist-sticky-2,th.hist-sticky-3{background:var(--gray-800);z-
 <button class="scroll-nav-btn" onclick="window.jumpToSection('section-net')">صافي الربح</button>
 </div>
 <div class="table-container" id="forecast-table-container">
-<table id="forecast-table"><thead><tr><th class="forecast-sticky-name">البيان</th><th colspan="12" class="header-forecast" id="forecast-header-year">التنبؤ 2026</th><th class="forecast-sticky-total">الإجمالي</th></tr><tr><th class="forecast-sticky-name">الشهر</th><th class="header-forecast">يناير</th><th class="header-forecast">فبراير</th><th class="header-forecast">مارس</th><th class="header-forecast">أبريل</th><th class="header-forecast">مايو</th><th class="header-forecast">يونيو</th><th class="header-forecast">يوليو</th><th class="header-forecast">أغسطس</th><th class="header-forecast">سبتمبر</th><th class="header-forecast">أكتوبر</th><th class="header-forecast">نوفمبر</th><th class="header-forecast">ديسمبر</th><th class="forecast-sticky-total">الإجمالي</th></tr></thead><tbody id="forecastBody"></tbody></table>
+<table id="forecast-table"><thead><tr><th class="forecast-sticky-name">البيان</th><th colspan="12" class="header-forecast" id="forecast-header-year">التنبؤ 2026</th><th class="forecast-sticky-total">الإجمالي</th></tr><!-- سيتم تحديث هذا الصف برمجياً لإضافة الأشهر الهجرية --><tr id="forecast-month-headers"><th class="forecast-sticky-name">الشهر</th><th class="header-forecast">يناير</th><th class="header-forecast">فبراير</th><th class="header-forecast">مارس</th><th class="header-forecast">أبريل</th><th class="header-forecast">مايو</th><th class="header-forecast">يونيو</th><th class="header-forecast">يوليو</th><th class="header-forecast">أغسطس</th><th class="header-forecast">سبتمبر</th><th class="header-forecast">أكتوبر</th><th class="header-forecast">نوفمبر</th><th class="header-forecast">ديسمبر</th><th class="forecast-sticky-total">الإجمالي</th></tr></thead><tbody id="forecastBody"></tbody></table>
 </div>
 </div>
 
@@ -280,6 +284,8 @@ var lookbackYears=3;
 var trendChartInstance=null,breakdownChartInstance=null;
 var months=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
 var monthsAr=['يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+var hijriMonthsAr=['محرم','صفر','ربيع الأول','ربيع الآخر','جمادى الأولى','جمادى الآخرة','رجب','شعبان','رمضان','شوال','ذو القعدة','ذو الحجة'];
+
 var defaultUsers={admin:{password:'1234',role:'admin',name:'مدير النظام'},viewer:{password:'0000',role:'viewer',name:'مشاهد'}};
 var dbUsers=null;
 var defaultAccounts=[
@@ -290,6 +296,93 @@ var defaultAccounts=[
 {id:'admin_1',name:'راتب الشريك',group:'admin',type:'cost',forecastType:'fixed',isSystem:false,hist:{y2024:Array(12).fill(25000),y2025:Array(12).fill(25000)}}
 ];
 var accounts=null;
+
+// التحقق من تحميل مكتبة التاريخ الهجري
+var useHijri = (typeof moment !== 'undefined' && typeof moment().iMonth === 'function');
+
+/* ===== دوال التقويم الهجري ===== */
+function getHijriOverlap(gYear, gMonth0) {
+    if (!useHijri) return {};
+    var daysInMonth = new Date(gYear, gMonth0 + 1, 0).getDate();
+    var overlap = {};
+    for (var d = 1; d <= daysInMonth; d++) {
+        var dateStr = gYear + '-' + String(gMonth0+1).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+        try {
+            var hijriMonth = moment(dateStr, 'YYYY-MM-DD').iMonth(); // 0 to 11 (8 is Ramadan)
+            overlap[hijriMonth] = (overlap[hijriMonth] || 0) + 1;
+        } catch(e) { return {}; }
+    }
+    return overlap;
+}
+
+function getDominantHijriMonth(gYear, gMonth0) {
+    var overlap = getHijriOverlap(gYear, gMonth0);
+    var maxDays = 0, dominantMonth = -1;
+    for (var h in overlap) {
+        if (overlap[h] > maxDays) {
+            maxDays = overlap[h];
+            dominantMonth = parseInt(h);
+        }
+    }
+    return dominantMonth;
+}
+
+function updateMonthHeaders() {
+    var headerCells = document.querySelectorAll('#forecast-month-headers .header-forecast');
+    if(headerCells.length === 0) return;
+    headerCells.forEach(function(cell, index) {
+        var mi = index;
+        var dominant = getDominantHijriMonth(targetYear, mi);
+        var hijriName = hijriMonthsAr[dominant] || '';
+        var icon = '';
+        var style = 'font-size:11px; font-weight:400; color:#c7d2fe; display:block; margin-top:2px;';
+        if (dominant === 8) { icon = ' 🌙'; style += 'color:#fcd34d; font-weight:700;'; } // رمضان
+        else if (dominant === 9) { icon = ' 🎉'; style += 'color:#a7f3d0;'; } // شوال (عيد الفطر)
+        else if (dominant === 11) { icon = ' 🕋'; style += 'color:#93c5fd;'; } // ذو الحجة (الحج)
+
+        cell.innerHTML = monthsAr[mi] + '<span style="' + style + '">' + hijriName + icon + '</span>';
+    });
+}
+
+function getHijriDailyAverages(acc) {
+    if (!useHijri) return Array(12).fill(0);
+    var hijriTotals = Array(12).fill(0);
+    var hijriDays = Array(12).fill(0);
+
+    var histYears = Object.keys(acc.hist)
+        .filter(function(k) { return k.startsWith('y') && Array.isArray(acc.hist[k]) })
+        .map(function(k) { return parseInt(k.replace('y', '')) })
+        .filter(function(y) { return y < targetYear });
+
+    histYears.forEach(function(y) {
+        var data = acc.hist['y'+y];
+        if (!data) return;
+        for (var m = 0; m < 12; m++) {
+            if (data[m] === 0) continue;
+            var overlap = getHijriOverlap(y, m);
+            var daysInMonth = new Date(y, m+1, 0).getDate();
+            var dailyValue = data[m] / daysInMonth;
+
+            for (var hMonth in overlap) {
+                hijriTotals[parseInt(hMonth)] += dailyValue * overlap[hMonth];
+                hijriDays[parseInt(hMonth)] += overlap[hMonth];
+            }
+        }
+    });
+
+    var averages = Array(12).fill(0);
+    var overallAvgDaily = 0, totalDays = 0, totalSum = 0;
+    histYears.forEach(function(y) {
+        var data = acc.hist['y'+y];
+        if(data) { for(var m=0; m<12; m++) { totalSum += data[m]; totalDays += new Date(y, m+1, 0).getDate(); } }
+    });
+    if (totalDays > 0) overallAvgDaily = totalSum / totalDays;
+
+    for (var i = 0; i < 12; i++) {
+        averages[i] = hijriDays[i] > 0 ? (hijriTotals[i] / hijriDays[i]) : overallAvgDaily;
+    }
+    return averages;
+}
 
 /* ===== تنظيف أعمق ===== */
 function deduplicateAccounts(){
@@ -344,7 +437,7 @@ function debouncedSave(){clearTimeout(saveTimeout);saveTimeout=setTimeout(saveAc
 function showToast(msg,type){var t=document.createElement('div');t.className='toast toast-'+(type||'info');t.textContent=msg;document.body.appendChild(t);requestAnimationFrame(function(){t.classList.add('show')});setTimeout(function(){t.classList.remove('show');setTimeout(function(){t.remove()},350)},3000)}
 function canDo(action){if(!currentUser)return false;var p={admin:['view','edit_data','add_item','delete_item','change_weights','manage_users','change_passwords'],editor:['view','edit_data','add_item','delete_item','change_weights'],viewer:['view']};return(p[currentUser.role]||[]).indexOf(action)!==-1}
 function applyPermissions(){document.getElementById('tab-btn-users').style.display=canDo('manage_users')?'':'none';setTimeout(function(){if(!canDo('edit_data'))document.querySelectorAll('#tab1 input[type="number"],#tab2 input[type="number"]').forEach(function(i){i.disabled=true});if(!canDo('add_item'))document.querySelectorAll('.btn-add').forEach(function(b){b.disabled=true});if(!canDo('delete_item'))document.querySelectorAll('.btn-delete').forEach(function(b){b.disabled=true});if(!canDo('change_weights'))document.querySelectorAll('.weights-panel input,.weights-panel .btn-apply').forEach(function(el){el.disabled=true})},200)}
-function updateYearUI(){document.getElementById('year-display').innerText='('+targetYear+')';document.getElementById('forecast-header-year').innerText='التنبؤ '+targetYear;document.getElementById('sumRevYear').innerText=targetYear;document.getElementById('sumGrossYear').innerText=targetYear;document.getElementById('sumNetYear').innerText=targetYear;document.getElementById('comp-y-2').innerText=targetYear-2;document.getElementById('comp-y-1').innerText=targetYear-1;document.getElementById('comp-y0').innerText=targetYear}
+function updateYearUI(){document.getElementById('year-display').innerText='('+targetYear+')';document.getElementById('forecast-header-year').innerText='التنبؤ '+targetYear;document.getElementById('sumRevYear').innerText=targetYear;document.getElementById('sumGrossYear').innerText=targetYear;document.getElementById('sumNetYear').innerText=targetYear;document.getElementById('comp-y-2').innerText=targetYear-2;document.getElementById('comp-y-1').innerText=targetYear-1;document.getElementById('comp-y0').innerText=targetYear; updateMonthHeaders(); }
 function fmt(n){if(n===0||n===null||n===undefined)return'0';return n.toLocaleString('en-US')}
 
 window.resetData=function(){document.getElementById('reset-modal').classList.add('show')};
@@ -364,8 +457,8 @@ window.handleLogout=function(){currentUser=null;document.getElementById('app-con
 
 window.jumpToSection=function(s){var c=document.getElementById('forecast-table-container');if(s==='top'){c.scrollTo({top:0,behavior:'smooth'});return}var el=document.getElementById(s);if(el)el.scrollIntoView({behavior:'smooth',block:'center'})};
 
-/* ===== خوارزميات التنبؤ الديناميكية ===== */
-function ensembleForecast(arr, mi){
+/* ===== خوارزميات التنبؤ الديناميكية (معدلة لتدعم الموسمية الهجرية) ===== */
+function ensembleForecast(arr, mi, tYear, acc){
     var Y=arr.filter(function(v){return v!==0});
     if(Y.length<3)return Math.round(Y.length>0?Y[Y.length-1]:0);
     var N=Y.length,X=[];
@@ -374,41 +467,40 @@ function ensembleForecast(arr, mi){
     for(var i=0;i<N;i++){sx+=X[i];sy+=Y[i];sxy+=X[i]*Y[i];sx2+=X[i]*X[i]}
     var b=(N*sxy-sx*sy)/(N*sx2-sx*sx),a=(sy-b*sx)/N;
     var lrF=a+b*(N+mi+1),l3=Y.slice(-3),maF=(l3[0]+l3[1]+l3[2])/3;
-    /* حساب الموسمية الديناميكي (يعمل مع أي عدد من السنوات) */
-    var totalMonths=arr.length;
-    var numYears=Math.floor(totalMonths/12);
-    var seasonalSum=0,seasonCount=0;
-    for(var y=0;y<numYears;y++){
-        var val=arr[mi+y*12];
-        if(val){seasonalSum+=val;seasonCount++}
+    
+    /* حساب الموسمية الهجرية بدلاً من الميلادية */
+    var hijriAverages = getHijriDailyAverages(acc);
+    var targetOverlap = getHijriOverlap(tYear, mi);
+    var daysInTargetMonth = new Date(tYear, mi + 1, 0).getDate();
+    var hijriForecast = 0;
+    
+    for (var hMonth in targetOverlap) {
+        hijriForecast += hijriAverages[parseInt(hMonth)] * targetOverlap[hMonth];
     }
-    var mAvg=seasonCount>0?(seasonalSum/seasonCount):(sy/N);
-    var sIdx=(sy/N)>0?(mAvg/(sy/N)):1;
-    var sF=lrF*sIdx;
-    return Math.round(W_MA*maF+W_LR*lrF+W_SEASONAL*sF);
+    
+    // في حال عدم وجود بيانات هجرية كافية، نعود للانحدار الخطي كاحتياط
+    if (hijriForecast === 0) hijriForecast = lrF; 
+
+    return Math.round(W_MA*maF+W_LR*lrF+W_SEASONAL*hijriForecast);
 }
 
 function getForecastValue(acc, mi) {
-    /* 1. جمع كل السنوات التاريخية المتاحة قبل سنة التنبؤ */
     var histYears = Object.keys(acc.hist)
         .filter(function(k) { return k.startsWith('y') && acc.hist[k] && Array.isArray(acc.hist[k]) })
         .map(function(k) { return parseInt(k.replace('y', '')) })
         .filter(function(y) { return y < targetYear })
         .sort(function(a, b) { return a - b });
 
-    /* 2. أخذ عدد السنوات الذي حدده المستخدم */
     var recentYears = histYears.slice(-lookbackYears);
 
     if (recentYears.length === 0) return 0;
 
-    /* 3. إذا كان البند ثابتاً، نحسب المتوسط بناءً على آخر سنة متاحة */
     if (acc.forecastType === 'fixed') {
         var lastYear = recentYears[recentYears.length - 1];
         var lastYearData = acc.hist['y' + lastYear];
         return Math.round(lastYearData.reduce(function(a, b) { return a + b }, 0) / 12);
     }
 
-    /* 4. دمج بيانات السنوات المحددة في مصفوفة واحدة متسلسلة زمنياً */
     var fullHistory = [];
     recentYears.forEach(function(y) {
         var yearData = acc.hist['y' + y];
@@ -419,8 +511,8 @@ function getForecastValue(acc, mi) {
 
     if (fullHistory.length === 0) return 0;
 
-    /* 5. تطبيق خوارزميات التنبؤ */
-    return ensembleForecast(fullHistory, mi);
+    // تمرير سنة التنبؤ وحساب البند لدعم الموسمية الهجرية
+    return ensembleForecast(fullHistory, mi, targetYear, acc);
 }
 
 window.updateWeightsUI=function(){
@@ -442,7 +534,7 @@ lookbackYears=parseInt(document.getElementById('lookbackYears').value)||3;
 if(lookbackYears<1)lookbackYears=1;
 accounts.forEach(function(acc){if(!acc.forecast)acc.forecast={};acc.forecast['y'+targetYear]=[];for(var i=0;i<12;i++)acc.forecast['y'+targetYear].push(getForecastValue(acc,i))});
 buildAll();applyPermissions();saveAccounts();saveSettings();
-showToast('تم حساب التنبؤات (آخر '+lookbackYears+' سنوات)','success');
+showToast('تم حساب التنبؤات بناءً على المواسم الهجرية (آخر '+lookbackYears+' سنوات)','success');
 };
 
 window.addItem=async function(){if(!canDo('add_item'))return;var n=document.getElementById('newName').value.trim(),g=document.getElementById('newGroup').value,t=document.getElementById('newType').value;if(!n){showToast('أدخل اسم البند','error');return}
