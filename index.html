@@ -249,7 +249,7 @@ th.hist-sticky-1,th.hist-sticky-2,th.hist-sticky-3{background:var(--gray-800);z-
 </div>
 </div>
 
-<!-- ✅ تم تعديل tab4: إضافة عناصر تحكم الفترة والسنوات -->
+<!-- ✅ تمت إضافة سنة المقارنة الثالثة -->
 <div id="tab4" class="tab-content">
 <h2>📈 التحليل البياني والنسب <span id="analysis-year-label" style="color:var(--warning);font-size:16px">(2026)</span></h2>
 <div class="analysis-controls">
@@ -267,6 +267,7 @@ th.hist-sticky-1,th.hist-sticky-2,th.hist-sticky-3{background:var(--gray-800);z-
         <label>🔄 سنوات المقارنة:</label>
         <select id="analysis-hist-year1" onchange="window.updateAnalysis()"><option value="">-- سنة 1 --</option></select>
         <select id="analysis-hist-year2" onchange="window.updateAnalysis()"><option value="">-- سنة 2 --</option></select>
+        <select id="analysis-hist-year3" onchange="window.updateAnalysis()"><option value="">-- سنة 3 --</option></select>
     </div>
 </div>
 <div class="charts-container">
@@ -391,13 +392,14 @@ window.updateHist=async function(id,yk,i,v){if(!canDo('edit_data'))return;var a=
 
 function initCompControls() { var startSel = document.getElementById('comp-start-month'); var endSel = document.getElementById('comp-end-month'); var baseSel = document.getElementById('comp-base-year'); var hy1 = document.getElementById('comp-hist-year1'); var hy2 = document.getElementById('comp-hist-year2'); var hy3 = document.getElementById('comp-hist-year3'); if(!startSel) return; startSel.innerHTML = ''; endSel.innerHTML = ''; for(var i=0; i<12; i++) { startSel.innerHTML += '<option value="'+i+'">'+monthsAr[i]+'</option>'; endSel.innerHTML += '<option value="'+i+'">'+monthsAr[i]+'</option>'; } endSel.value = 11; baseSel.innerHTML = ''; for(var y = targetYear; y >= 2020; y--) baseSel.innerHTML += '<option value="'+y+'">'+y+'</option>'; function populateHist(sel, defVal) { sel.innerHTML = '<option value="">-- اختيار --</option>'; for(var y = targetYear; y >= 2020; y--) sel.innerHTML += '<option value="'+y+'">'+y+'</option>'; sel.value = defVal || ''; } populateHist(hy1, targetYear - 1); populateHist(hy2, targetYear - 2); populateHist(hy3, ''); }
 
-/* ✅ دالة جديدة: تهيئة عناصر تحكم التحليل */
+/* ✅ تمت إضافة السنة الثالثة في التهيئة */
 function initAnalysisControls() {
     var startSel = document.getElementById('analysis-start-month');
     var endSel = document.getElementById('analysis-end-month');
     var baseSel = document.getElementById('analysis-base-year');
     var hy1 = document.getElementById('analysis-hist-year1');
     var hy2 = document.getElementById('analysis-hist-year2');
+    var hy3 = document.getElementById('analysis-hist-year3');
     if(!startSel) return;
     startSel.innerHTML = '';
     endSel.innerHTML = '';
@@ -417,11 +419,11 @@ function initAnalysisControls() {
     }
     populateHist(hy1, targetYear - 1);
     populateHist(hy2, targetYear - 2);
+    populateHist(hy3, targetYear - 3);
 }
 
 window.updateCompTable=function(){ var startMi = parseInt(document.getElementById('comp-start-month').value); var endMi = parseInt(document.getElementById('comp-end-month').value); var baseYear = parseInt(document.getElementById('comp-base-year').value); if(startMi > endMi) { var temp = startMi; startMi = endMi; endMi = temp; } var compYears = []; ['comp-hist-year1', 'comp-hist-year2', 'comp-hist-year3'].forEach(function(id) { var val = document.getElementById(id).value; if(val && parseInt(val) !== baseYear) compYears.push(parseInt(val)); }); var periodLabel = ' ('+monthsAr[startMi]+' - '+monthsAr[endMi]+')'; var thead = '<tr><th class="comp-sticky-name">البيان</th>'; compYears.forEach(function(cy) { thead += '<th>'+cy+periodLabel+'</th><th style="background:#4b5563">التغير عن '+cy+'</th>'; }); thead += '<th>'+baseYear+' (فعلي)</th><th style="background:var(--purple)">'+baseYear+' (تنبؤ)</th><th style="background:#374151">انحراف التنبؤ</th></tr>'; document.getElementById('comp-table-head').innerHTML = thead; function sumPeriod(acc, year, start, end, mode) { var total = 0; var hist = acc.hist['y'+year] || Array(12).fill(0); var fore = (acc.forecast && acc.forecast['y'+year]) ? acc.forecast['y'+year] : Array(12).fill(0); for(var i=start; i<=end; i++) { if (mode === 'actual') total += hist[i] || 0; else if (mode === 'forecast') total += fore[i] || 0; else total += (hist[i] > 0 ? hist[i] : fore[i]); } return total; } var h=''; function rg(g){ accounts.filter(function(a){return a.group===g}).forEach(function(acc){ var baseActual = sumPeriod(acc, baseYear, startMi, endMi, 'actual'); var baseForecast = sumPeriod(acc, baseYear, startMi, endMi, 'forecast'); var diffFc = baseActual - baseForecast; var diffFcPct = baseForecast !== 0 ? (diffFc / Math.abs(baseForecast) * 100) : 0; var diffFcClass = (g === 'rev' ? (diffFc > 0 ? 'positive' : 'negative') : (diffFc < 0 ? 'positive' : 'negative')); h += '<tr><td class="comp-sticky-name">'+acc.name+'</td>'; compYears.forEach(function(cy) { var histVal = sumPeriod(acc, cy, startMi, endMi, 'combined'); var chgY = histVal !== 0 ? ((baseActual - histVal) / Math.abs(histVal) * 100) : 0; var chgYClass = (g === 'rev' ? (chgY > 0 ? 'positive' : 'negative') : (chgY < 0 ? 'positive' : 'negative')); h += '<td class="num-cell">'+fmt(histVal)+'</td>'; h += '<td class="'+chgYClass+'">'+(histVal!==0?chgY.toFixed(1)+'%':'—')+'</td>'; }); h += '<td class="num-cell" style="font-weight:700;color:var(--primary)">'+fmt(baseActual)+'</td>'; h += '<td class="num-cell" style="color:var(--purple)">'+fmt(baseForecast)+'</td>'; h += '<td class="'+diffFcClass+'">'+fmt(diffFc)+' ('+diffFcPct.toFixed(1)+'%)</td>'; h += '</tr>'; }); } ['rev','cogs','opex_other','marketing','admin'].forEach(rg); function calcNet(year, mode) { return accounts.reduce(function(s, acc) { var val = sumPeriod(acc, year, startMi, endMi, mode); if(acc.group==='rev') return s + val; if(['cogs','opex_other','marketing','admin'].indexOf(acc.group)!==-1) return s - val; return s; }, 0); } var nActual = calcNet(baseYear, 'actual'); var nForecast = calcNet(baseYear, 'forecast'); var nDiffFc = nActual - nForecast; var nDiffFcPct = nForecast !== 0 ? (nDiffFc / Math.abs(nForecast) * 100) : 0; var nDiffFcClass = nDiffFc > 0 ? 'positive' : 'negative'; h += '<tr style="background:var(--success-light);font-weight:800;border-top:3px solid var(--success)">'; h += '<td class="comp-sticky-name" style="background:var(--success-light)">صافي الربح</td>'; compYears.forEach(function(cy) { var nHist = calcNet(cy, 'combined'); var nChgY = nHist !== 0 ? ((nActual - nHist) / Math.abs(nHist) * 100) : 0; var nChgYClass = nChgY > 0 ? 'positive' : 'negative'; h += '<td class="num-cell">'+fmt(nHist)+'</td>'; h += '<td class="'+nChgYClass+'">'+(nHist!==0?nChgY.toFixed(1)+'%':'—')+'</td>'; }); h += '<td style="color:var(--primary)" class="num-cell">'+fmt(nActual)+'</td>'; h += '<td style="color:var(--purple)" class="num-cell">'+fmt(nForecast)+'</td>'; h += '<td class="'+nDiffFcClass+'">'+fmt(nDiffFc)+' ('+nDiffFcPct.toFixed(1)+'%)</td>'; h += '</tr>'; document.getElementById('compBody').innerHTML=h; }
 
-/* ✅ دالة معدلة: تقبل نطاق أشهر */
 function getMixedYearData(year, startMi, endMi) {
     if(startMi === undefined) startMi = 0;
     if(endMi === undefined) endMi = 11;
@@ -445,7 +447,7 @@ function getMixedYearData(year, startMi, endMi) {
     return d;
 }
 
-/* ✅ دالة معدلة بالكامل: تقرأ الفترة والسنوات من عناصر التحكم */
+/* ✅ تمت إضافة السنة الثالثة في التحليل */
 function updateChartsAndRatios(){
     var startMi = parseInt(document.getElementById('analysis-start-month').value) || 0;
     var endMi = parseInt(document.getElementById('analysis-end-month').value) || 11;
@@ -453,7 +455,7 @@ function updateChartsAndRatios(){
     var baseYear = parseInt(document.getElementById('analysis-base-year').value) || targetYear;
 
     var compYears = [];
-    ['analysis-hist-year1', 'analysis-hist-year2'].forEach(function(id) {
+    ['analysis-hist-year1', 'analysis-hist-year2', 'analysis-hist-year3'].forEach(function(id) {
         var val = document.getElementById(id).value;
         if(val && parseInt(val) !== baseYear) compYears.push(parseInt(val));
     });
@@ -464,7 +466,6 @@ function updateChartsAndRatios(){
 
     var periodLabel = monthsAr[startMi]+' - '+monthsAr[endMi];
 
-    /* بناء بيانات كل السنوات */
     var allYears = compYears.concat([baseYear]).sort(function(a,b){return a-b});
     var allData = {};
     allYears.forEach(function(y){ allData[y] = getMixedYearData(y, startMi, endMi); });
@@ -473,7 +474,6 @@ function updateChartsAndRatios(){
     var revData = allYears.map(function(y){return allData[y].rev});
     var netData = allYears.map(function(y){return allData[y].net});
 
-    /* رسم بياني 1: الإيرادات وصافي الربح */
     var c1=document.getElementById('trendChart').getContext('2d');
     if(trendChartInstance) trendChartInstance.destroy();
     trendChartInstance=new Chart(c1,{
@@ -488,7 +488,6 @@ function updateChartsAndRatios(){
         options:{responsive:true,plugins:{legend:{position:'top'}},scales:{y:{ticks:{callback:function(v){return (v/1000).toFixed(0)+'k'}}}}}
     });
 
-    /* رسم بياني 2: هيكل التكاليف */
     var cogsData = allYears.map(function(y){return allData[y].cogs});
     var opexData = allYears.map(function(y){return allData[y].opex_other});
     var mktData = allYears.map(function(y){return allData[y].marketing});
@@ -512,12 +511,10 @@ function updateChartsAndRatios(){
         options:{responsive:true,scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:function(v){return (v/1000).toFixed(0)+'k'}}}},plugins:{legend:{position:'top'}}}
     });
 
-    /* النسب المالية */
     function cr(n,d){return d===0?'0%':(n/d*100).toFixed(1)+'%'}
 
     var ratiosHtml = '';
 
-    /* هامش مجمل الربح */
     ratiosHtml += '<div class="ratio-card"><h4>هامش مجمل الربح</h4><div class="ratio-values">';
     allYears.forEach(function(y){
         var isBase = (y === baseYear);
@@ -525,7 +522,6 @@ function updateChartsAndRatios(){
     });
     ratiosHtml += '</div></div>';
 
-    /* هامش صافي الربح */
     ratiosHtml += '<div class="ratio-card"><h4>هامش صافي الربح</h4><div class="ratio-values">';
     allYears.forEach(function(y){
         var isBase = (y === baseYear);
@@ -533,7 +529,6 @@ function updateChartsAndRatios(){
     });
     ratiosHtml += '</div></div>';
 
-    /* نسبة تكلفة البضاعة */
     ratiosHtml += '<div class="ratio-card"><h4>نسبة تكلفة البضاعة</h4><div class="ratio-values">';
     allYears.forEach(function(y){
         var isBase = (y === baseYear);
@@ -541,7 +536,6 @@ function updateChartsAndRatios(){
     });
     ratiosHtml += '</div></div>';
 
-    /* نسبة التكاليف التسويقية */
     ratiosHtml += '<div class="ratio-card"><h4>نسبة التكاليف التسويقية</h4><div class="ratio-values">';
     allYears.forEach(function(y){
         var isBase = (y === baseYear);
@@ -549,7 +543,6 @@ function updateChartsAndRatios(){
     });
     ratiosHtml += '</div></div>';
 
-    /* نسبة التكاليف الإدارية */
     ratiosHtml += '<div class="ratio-card"><h4>نسبة التكاليف الإدارية</h4><div class="ratio-values">';
     allYears.forEach(function(y){
         var isBase = (y === baseYear);
@@ -557,7 +550,6 @@ function updateChartsAndRatios(){
     });
     ratiosHtml += '</div></div>';
 
-    /* نسبة التكاليف التشغيلية */
     ratiosHtml += '<div class="ratio-card"><h4>نسبة التكاليف التشغيلية</h4><div class="ratio-values">';
     allYears.forEach(function(y){
         var isBase = (y === baseYear);
@@ -568,7 +560,6 @@ function updateChartsAndRatios(){
     document.getElementById('ratiosGrid').innerHTML = ratiosHtml;
 }
 
-/* ✅ دالة جديدة: تحديث التحليل عند تغيير أي فلتر */
 window.updateAnalysis = function(){ updateChartsAndRatios(); };
 
 function parseNum(s){return parseFloat(String(s).replace(/,/g,''))||0}
