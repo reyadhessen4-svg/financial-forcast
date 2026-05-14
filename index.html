@@ -108,10 +108,10 @@ th.hist-sticky-1,th.hist-sticky-2,th.hist-sticky-3{background:var(--gray-800);z-
 .var-month-cell{font-size:12px;color:var(--gray-600);font-weight:700}
 .reset-panel{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:18px;padding:14px 18px;background:linear-gradient(135deg,var(--danger-light),#fff);border:1px solid #fecaca;border-radius:var(--radius-sm)}
 .reset-panel label{font-weight:800;font-size:14px;color:var(--danger)}
-.comp-controls{margin-bottom:22px; padding:18px; background:linear-gradient(135deg,#f0f4ff,#fff); border:1px solid var(--gray-200); border-radius:var(--radius-sm); display:flex; gap:15px; align-items:center; flex-wrap:wrap}
-.comp-controls label{font-weight:800; font-size:14px; color:var(--primary)}
-.comp-controls select{padding:10px; border:1px solid var(--gray-300); border-radius:6px; font-weight:700; font-size:14px; text-align:center; background:#fff; width:120px}
-.comp-controls span{font-weight:700; font-size:14px}
+.comp-controls,.analysis-controls{margin-bottom:22px;padding:18px;background:linear-gradient(135deg,#f0f4ff,#fff);border:1px solid var(--gray-200);border-radius:var(--radius-sm);display:flex;gap:15px;align-items:center;flex-wrap:wrap}
+.comp-controls label,.analysis-controls label{font-weight:800;font-size:14px;color:var(--primary)}
+.comp-controls select,.analysis-controls select{padding:10px;border:1px solid var(--gray-300);border-radius:6px;font-weight:700;font-size:14px;text-align:center;background:#fff;width:120px}
+.comp-controls span,.analysis-controls span{font-weight:700;font-size:14px}
 </style>
 </head>
 <body>
@@ -223,7 +223,6 @@ th.hist-sticky-1,th.hist-sticky-2,th.hist-sticky-3{background:var(--gray-800);z-
 
 <div id="tab3" class="tab-content">
 <h2>المقارنة السنوية والفترية <button class="btn-excel" onclick="window.exportExcel('comp')">📥 تصدير إكسيل</button></h2>
-
 <div class="comp-controls">
     <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
         <label>📅 الفترة:</label>
@@ -242,7 +241,6 @@ th.hist-sticky-1,th.hist-sticky-2,th.hist-sticky-3{background:var(--gray-800);z-
         <select id="comp-hist-year3" onchange="window.updateCompTable()"><option value="">-- سنة 3 --</option></select>
     </div>
 </div>
-
 <div class="table-container" style="max-height:60vh">
 <table id="comp-table">
     <thead id="comp-table-head"></thead>
@@ -251,8 +249,26 @@ th.hist-sticky-1,th.hist-sticky-2,th.hist-sticky-3{background:var(--gray-800);z-
 </div>
 </div>
 
+<!-- ✅ تم تعديل tab4: إضافة عناصر تحكم الفترة والسنوات -->
 <div id="tab4" class="tab-content">
-<h2>📈 التحليل البياني والنسب</h2>
+<h2>📈 التحليل البياني والنسب <span id="analysis-year-label" style="color:var(--warning);font-size:16px">(2026)</span></h2>
+<div class="analysis-controls">
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+        <label>📅 الفترة:</label>
+        <select id="analysis-start-month" onchange="window.updateAnalysis()"></select>
+        <span>إلى</span>
+        <select id="analysis-end-month" onchange="window.updateAnalysis()"></select>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+        <label>🗓️ السنة الأساسية:</label>
+        <select id="analysis-base-year" onchange="window.updateAnalysis()"></select>
+    </div>
+    <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+        <label>🔄 سنوات المقارنة:</label>
+        <select id="analysis-hist-year1" onchange="window.updateAnalysis()"><option value="">-- سنة 1 --</option></select>
+        <select id="analysis-hist-year2" onchange="window.updateAnalysis()"><option value="">-- سنة 2 --</option></select>
+    </div>
+</div>
 <div class="charts-container">
 <div class="chart-box"><h3 style="text-align:center">الإيرادات وصافي الربح</h3><canvas id="trendChart"></canvas></div>
 <div class="chart-box"><h3 style="text-align:center">هيكل التكاليف والأرباح</h3><canvas id="breakdownChart"></canvas></div>
@@ -313,14 +329,14 @@ function deduplicateAccounts(){ if(!accounts||!Array.isArray(accounts)){accounts
 function updateDataHealth(removed,fixed){ var el=document.getElementById('data-health');if(!el)return; if(removed===0&&fixed===0)el.innerHTML='<span style="color:var(--success)">✅ البيانات سليمة ('+accounts.length+' بند)</span>'; else el.innerHTML='<span style="color:var(--warning)">⚠️ تم تنظيف '+removed+' مكرر و'+fixed+' قيمة</span>'; }
 window.cleanDuplicates=function(){ var before=accounts.length;deduplicateAccounts();var after=accounts.length;var removed=before-after; if(removed>0){buildAll();applyPermissions();if(DB)DB.ref('accounts').set(accounts);showToast('تم تنظيف '+removed+' بند مكرر/تالف','success')} else showToast('لا توجد مكررات - البيانات سليمة','info'); };
 
-function initData(){ dbUsers=loadLocal('users')||JSON.parse(JSON.stringify(defaultUsers)); accounts=loadLocal('accounts')||JSON.parse(JSON.stringify(defaultAccounts)); var s=loadLocal('settings');if(s){targetYear=s.targetYear||2026;lookbackYears=s.lookbackYears||3;var lbEl=document.getElementById('lookbackYears');if(lbEl)lbEl.value=lookbackYears;} deduplicateAccounts();buildMonthCheckboxes();initCompControls(); }
+function initData(){ dbUsers=loadLocal('users')||JSON.parse(JSON.stringify(defaultUsers)); accounts=loadLocal('accounts')||JSON.parse(JSON.stringify(defaultAccounts)); var s=loadLocal('settings');if(s){targetYear=s.targetYear||2026;lookbackYears=s.lookbackYears||3;var lbEl=document.getElementById('lookbackYears');if(lbEl)lbEl.value=lookbackYears;} deduplicateAccounts();buildMonthCheckboxes();initCompControls();initAnalysisControls(); }
 function setSync(state,text){var el=document.getElementById('sync-status');if(!el)return;el.className='sync-badge';if(state==='local')el.classList.add('sync-local');else if(state==='cloud')el.classList.add('sync-cloud');else if(state==='saving')el.classList.add('sync-saving');else if(state==='error')el.classList.add('sync-error');el.innerText=text}
 function saveLocal(key,data){try{localStorage.setItem('zad_'+key,JSON.stringify(data))}catch(e){}}
 function loadLocal(key){try{var d=localStorage.getItem('zad_'+key);return d?JSON.parse(d):null}catch(e){return null}}
 function loadScript(url){return new Promise(function(resolve){var s=document.createElement('script');s.src=url;s.onload=function(){resolve(true)};s.onerror=function(){resolve(false)};document.head.appendChild(s)})}
 async function initFirebase(){try{var r1=await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js');if(!r1)return;var r2=await loadScript('https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js');if(!r2)return;if(typeof firebase==='undefined')return; var cfg={apiKey:"AIzaSyDyGVZKjpxWdqnE3brj5l3OjjOAPhYn8x0",authDomain:"financial-forcast-95786.firebaseapp.com",databaseURL:"https://financial-forcast-95786-default-rtdb.firebaseio.com",projectId:"financial-forcast-95786",storageBucket:"financial-forcast-95786.firebasestorage.app",messagingSenderId:"180041737366",appId:"1:180041737366:web:f11403e2d693c95b674eb7"};firebase.initializeApp(cfg);DB=firebase.database();fbReady=true;syncUsersFromCloud()}catch(e){console.error('Firebase error:',e)}}
 function syncUsersFromCloud(){if(!DB)return;DB.ref('users').once('value').then(function(snap){if(snap.exists()){dbUsers=snap.val();saveLocal('users',dbUsers)}else{DB.ref('users').set(dbUsers)}}).catch(function(){})}
-function syncDataFromCloud(){if(!DB)return;setSync('saving','⏳ مزامنة...');var p=[];p.push(DB.ref('accounts').once('value').then(function(snap){if(snap.exists()){accounts=snap.val();if(!Array.isArray(accounts))accounts=JSON.parse(JSON.stringify(defaultAccounts));deduplicateAccounts();saveLocal('accounts',accounts)}else{DB.ref('accounts').set(accounts)}}));p.push(DB.ref('settings').once('value').then(function(snap){if(snap.exists()){targetYear=snap.val().targetYear||2026;lookbackYears=snap.val().lookbackYears||3;var lbEl=document.getElementById('lookbackYears');if(lbEl)lbEl.value=lookbackYears;saveLocal('settings',{targetYear:targetYear,lookbackYears:lookbackYears})}}));Promise.all(p).then(function(){setSync('cloud','☁️ متزامن');updateYearUI();buildAll();applyPermissions()}).catch(function(){setSync('error','⚠️ خطأ سحابي')})}
+function syncDataFromCloud(){if(!DB)return;setSync('saving','⏳ مزامنة...');var p=[];p.push(DB.ref('accounts').once('value').then(function(snap){if(snap.exists()){accounts=snap.val();if(!Array.isArray(accounts))accounts=JSON.parse(JSON.stringify(defaultAccounts));deduplicateAccounts();saveLocal('accounts',accounts)}else{DB.ref('accounts').set(accounts)}}));p.push(DB.ref('settings').once('value').then(function(snap){if(snap.exists()){targetYear=snap.val().targetYear||2026;lookbackYears=snap.val().lookbackYears||3;var lbEl=document.getElementById('lookbackYears');if(lbEl)lbEl.value=lookbackYears;saveLocal('settings',{targetYear:targetYear,lookbackYears:lookbackYears})}}));Promise.all(p).then(function(){setSync('cloud','☁️ متزامن');updateYearUI();buildAll();applyPermissions();initCompControls();initAnalysisControls()}).catch(function(){setSync('error','⚠️ خطأ سحابي')})}
 async function saveAccounts(){saveLocal('accounts',accounts);if(!DB){setSync('local','📱 محفوظ محلياً');return}setSync('saving','💾 مزامنة...');try{await DB.ref('accounts').set(accounts);setSync('cloud','☁️ متزامن')}catch(e){setSync('error','⚠️ خطأ سحابي')}}
 async function saveUsers(){saveLocal('users',dbUsers);if(!DB)return;try{await DB.ref('users').set(dbUsers)}catch(e){}}
 async function saveSettings(){saveLocal('settings',{targetYear:targetYear,lookbackYears:lookbackYears});if(!DB)return;try{await DB.ref('settings').set({targetYear:targetYear,lookbackYears:lookbackYears})}catch(e){}}
@@ -332,7 +348,7 @@ function updateYearUI(){document.getElementById('year-display').innerText='('+ta
 function fmt(n){if(n===0||n===null||n===undefined)return'0';return n.toLocaleString('en-US')}
 
 window.resetData=function(){document.getElementById('reset-modal').classList.add('show')};
-window.confirmResetData=function(){ document.getElementById('reset-modal').classList.remove('show'); accounts=JSON.parse(JSON.stringify(defaultAccounts));dbUsers=JSON.parse(JSON.stringify(defaultUsers));targetYear=2026;lookbackYears=3; saveLocal('accounts',accounts);saveLocal('users',dbUsers);saveLocal('settings',{targetYear:targetYear,lookbackYears:lookbackYears}); if(DB){DB.ref('accounts').set(accounts);DB.ref('users').set(dbUsers);DB.ref('settings').set({targetYear:targetYear,lookbackYears:lookbackYears})} var lbEl=document.getElementById('lookbackYears');if(lbEl)lbEl.value=lookbackYears; updateYearUI();buildAll();applyPermissions();initCompControls();setSync('local','📱 تم الضبط');showToast('تم إعادة ضبط البيانات بنجاح','success'); };
+window.confirmResetData=function(){ document.getElementById('reset-modal').classList.remove('show'); accounts=JSON.parse(JSON.stringify(defaultAccounts));dbUsers=JSON.parse(JSON.stringify(defaultUsers));targetYear=2026;lookbackYears=3; saveLocal('accounts',accounts);saveLocal('users',dbUsers);saveLocal('settings',{targetYear:targetYear,lookbackYears:lookbackYears}); if(DB){DB.ref('accounts').set(accounts);DB.ref('users').set(dbUsers);DB.ref('settings').set({targetYear:targetYear,lookbackYears:lookbackYears})} var lbEl=document.getElementById('lookbackYears');if(lbEl)lbEl.value=lookbackYears; updateYearUI();buildAll();applyPermissions();initCompControls();initAnalysisControls();setSync('local','📱 تم الضبط');showToast('تم إعادة ضبط البيانات بنجاح','success'); };
 
 window.exportExcel=function(type){if(typeof XLSX==='undefined'){showToast('مكتبة Excel غير محملة','error');return}var tableId='',fileName='';if(type==='forecast'){tableId='forecast-table';fileName='التنبؤ_'+targetYear}else if(type==='hist'){tableId='hist-table';fileName='البيانات_التاريخية'}else if(type==='variance'){tableId='variance-table';fileName='الانحرافات_'+targetYear}else if(type==='comp'){tableId='comp-table';fileName='المقارنة_السنوية'}else return;var table=document.getElementById(tableId);if(!table){showToast('لا يوجد جدول','error');return}var wb=XLSX.utils.book_new();var ws=XLSX.utils.table_to_sheet(table);ws['!cols']=[];for(var i=0;i<20;i++)ws['!cols'].push({wch:18});XLSX.utils.book_append_sheet(wb,ws,'بيانات');XLSX.writeFile(wb,fileName+'.xlsx');showToast('تم تصدير الملف','success')};
 
@@ -368,143 +384,193 @@ window.buildVarianceTable=function(){ var selectedMonths=window.getSelectedMonth
 function formatInput(el){el.value=el.value.replace(/[^0-9]/g,'')}
 window.saveActualValue=async function(accId,mi,value){if(!canDo('edit_data')){showToast('لا صلاحية','error');return}var acc=accounts.find(function(a){return a.id===accId});if(acc){var yKey='y'+targetYear;if(!acc.hist[yKey])acc.hist[yKey]=Array(12).fill(0);acc.hist[yKey][mi]=parseFloat(value.replace(/,/g,''))||0;await saveAccounts();window.buildVarianceTable()}};
 function checkRollover(){var yKey='y'+targetYear;var hasDec=accounts.some(function(a){return a.hist[yKey]&&a.hist[yKey][11]>0});var sec=document.getElementById('rollover-section');if(hasDec){sec.style.display='block';document.getElementById('rollover-current-year').innerText=targetYear;document.getElementById('rollover-next-year').innerText=targetYear+1}else{sec.style.display='none'}}
-window.rollOverYear=async function(){if(!confirm('إغلاق سنة '+targetYear+' والتنبؤ لسنة '+(targetYear+1)+'؟'))return;targetYear++;accounts.forEach(function(acc){if(!acc.forecast)acc.forecast={};acc.forecast['y'+targetYear]=[];for(var i=0;i<12;i++)acc.forecast['y'+targetYear].push(getForecastValue(acc,i))});await saveSettings();await saveAccounts();updateYearUI();buildAll();applyPermissions();buildMonthCheckboxes();initCompControls();window.buildVarianceTable();showToast('تم إنشاء تنبؤ لسنة '+targetYear,'success')};
+window.rollOverYear=async function(){if(!confirm('إغلاق سنة '+targetYear+' والتنبؤ لسنة '+(targetYear+1)+'؟'))return;targetYear++;accounts.forEach(function(acc){if(!acc.forecast)acc.forecast={};acc.forecast['y'+targetYear]=[];for(var i=0;i<12;i++)acc.forecast['y'+targetYear].push(getForecastValue(acc,i))});await saveSettings();await saveAccounts();updateYearUI();buildAll();applyPermissions();buildMonthCheckboxes();initCompControls();initAnalysisControls();window.buildVarianceTable();showToast('تم إنشاء تنبؤ لسنة '+targetYear,'success')};
 
 function buildHistTable(){ var h='',gc={rev:'row-rev',cogs:'row-cogs',opex_other:'row-opex',marketing:'row-marketing',admin:'row-admin'}; var groupNames={rev:'الإيرادات',cogs:'تكاليف البضاعة',opex_other:'التكاليف التشغيلية الأخري',marketing:'التكاليف التسويقية',admin:'التكاليف الإدارية'}; var groupOrder=['rev','cogs','opex_other','marketing','admin']; groupOrder.forEach(function(g){ h+='<tr class="row-title"><td class="hist-sticky-1" style="background:var(--gray-200)"></td><td class="hist-sticky-2" style="background:var(--gray-200);text-align:right;font-size:15px">'+groupNames[g]+'</td><td class="hist-sticky-3" style="background:var(--gray-200)"></td><td colspan="13" style="background:var(--gray-200)"></td></tr>'; accounts.filter(function(a){return a.group===g}).forEach(function(acc){ [targetYear-2, targetYear-1, targetYear].forEach(function(y){ var histData=acc.hist['y'+y];if(!histData&&y===targetYear){acc.hist['y'+y]=Array(12).fill(0);histData=acc.hist['y'+y]}if(!histData)return; var isCurrentYear=(y===targetYear);var yearLabel=y+(isCurrentYear?' ⚡فعلي':''); h+='<tr class="'+gc[g]+(isCurrentYear?' row-current-actual':'')+'"><td class="hist-sticky-1">'+(!acc.isSystem?'<button class="btn btn-delete" onclick="window.deleteItem(\''+acc.id+'\')">حذف</button>':'')+'</td><td class="hist-sticky-2">'+acc.name+'</td><td class="hist-sticky-3">'+yearLabel+'</td>'; histData.forEach(function(v,i){h+='<td><input type="text" inputmode="numeric" class="input-hist" value="'+fmt(v)+'" oninput="formatInput(this)" onchange="window.updateHist(\''+acc.id+'\',\'y'+y+'\','+i+',this.value)"></td>'}); h+='<td style="background:var(--gray-100);font-weight:800" class="num-cell">'+fmt(histData.reduce(function(a,b){return a+b},0))+'</td></tr>'; })})}); document.getElementById('histBody').innerHTML=h; }
 window.updateHist=async function(id,yk,i,v){if(!canDo('edit_data'))return;var a=accounts.find(function(x){return x.id===id});if(a){a.hist[yk][i]=parseFloat(v.replace(/,/g,''))||0;await saveAccounts();buildHistTable();applyPermissions()}};
 
-// تهيئة أدوات تحكم المقارنة الديناميكية
-function initCompControls() {
-    var startSel = document.getElementById('comp-start-month');
-    var endSel = document.getElementById('comp-end-month');
-    var baseSel = document.getElementById('comp-base-year');
-    var hy1 = document.getElementById('comp-hist-year1');
-    var hy2 = document.getElementById('comp-hist-year2');
-    var hy3 = document.getElementById('comp-hist-year3');
+function initCompControls() { var startSel = document.getElementById('comp-start-month'); var endSel = document.getElementById('comp-end-month'); var baseSel = document.getElementById('comp-base-year'); var hy1 = document.getElementById('comp-hist-year1'); var hy2 = document.getElementById('comp-hist-year2'); var hy3 = document.getElementById('comp-hist-year3'); if(!startSel) return; startSel.innerHTML = ''; endSel.innerHTML = ''; for(var i=0; i<12; i++) { startSel.innerHTML += '<option value="'+i+'">'+monthsAr[i]+'</option>'; endSel.innerHTML += '<option value="'+i+'">'+monthsAr[i]+'</option>'; } endSel.value = 11; baseSel.innerHTML = ''; for(var y = targetYear; y >= 2020; y--) baseSel.innerHTML += '<option value="'+y+'">'+y+'</option>'; function populateHist(sel, defVal) { sel.innerHTML = '<option value="">-- اختيار --</option>'; for(var y = targetYear; y >= 2020; y--) sel.innerHTML += '<option value="'+y+'">'+y+'</option>'; sel.value = defVal || ''; } populateHist(hy1, targetYear - 1); populateHist(hy2, targetYear - 2); populateHist(hy3, ''); }
+
+/* ✅ دالة جديدة: تهيئة عناصر تحكم التحليل */
+function initAnalysisControls() {
+    var startSel = document.getElementById('analysis-start-month');
+    var endSel = document.getElementById('analysis-end-month');
+    var baseSel = document.getElementById('analysis-base-year');
+    var hy1 = document.getElementById('analysis-hist-year1');
+    var hy2 = document.getElementById('analysis-hist-year2');
     if(!startSel) return;
-    
-    startSel.innerHTML = ''; endSel.innerHTML = '';
+    startSel.innerHTML = '';
+    endSel.innerHTML = '';
     for(var i=0; i<12; i++) {
         startSel.innerHTML += '<option value="'+i+'">'+monthsAr[i]+'</option>';
         endSel.innerHTML += '<option value="'+i+'">'+monthsAr[i]+'</option>';
     }
     endSel.value = 11;
-
     baseSel.innerHTML = '';
-    for(var y = targetYear; y >= 2020; y--) baseSel.innerHTML += '<option value="'+y+'">'+y+'</option>';
-
+    for(var y = targetYear; y >= 2020; y--)
+        baseSel.innerHTML += '<option value="'+y+'">'+y+'</option>';
     function populateHist(sel, defVal) {
         sel.innerHTML = '<option value="">-- اختيار --</option>';
-        for(var y = targetYear; y >= 2020; y--) sel.innerHTML += '<option value="'+y+'">'+y+'</option>';
+        for(var y = targetYear; y >= 2020; y--)
+            sel.innerHTML += '<option value="'+y+'">'+y+'</option>';
         sel.value = defVal || '';
     }
-    
     populateHist(hy1, targetYear - 1);
     populateHist(hy2, targetYear - 2);
-    populateHist(hy3, ''); // Empty by default
 }
 
-window.updateCompTable=function(){
-    var startMi = parseInt(document.getElementById('comp-start-month').value);
-    var endMi = parseInt(document.getElementById('comp-end-month').value);
-    var baseYear = parseInt(document.getElementById('comp-base-year').value);
-    
+window.updateCompTable=function(){ var startMi = parseInt(document.getElementById('comp-start-month').value); var endMi = parseInt(document.getElementById('comp-end-month').value); var baseYear = parseInt(document.getElementById('comp-base-year').value); if(startMi > endMi) { var temp = startMi; startMi = endMi; endMi = temp; } var compYears = []; ['comp-hist-year1', 'comp-hist-year2', 'comp-hist-year3'].forEach(function(id) { var val = document.getElementById(id).value; if(val && parseInt(val) !== baseYear) compYears.push(parseInt(val)); }); var periodLabel = ' ('+monthsAr[startMi]+' - '+monthsAr[endMi]+')'; var thead = '<tr><th class="comp-sticky-name">البيان</th>'; compYears.forEach(function(cy) { thead += '<th>'+cy+periodLabel+'</th><th style="background:#4b5563">التغير عن '+cy+'</th>'; }); thead += '<th>'+baseYear+' (فعلي)</th><th style="background:var(--purple)">'+baseYear+' (تنبؤ)</th><th style="background:#374151">انحراف التنبؤ</th></tr>'; document.getElementById('comp-table-head').innerHTML = thead; function sumPeriod(acc, year, start, end, mode) { var total = 0; var hist = acc.hist['y'+year] || Array(12).fill(0); var fore = (acc.forecast && acc.forecast['y'+year]) ? acc.forecast['y'+year] : Array(12).fill(0); for(var i=start; i<=end; i++) { if (mode === 'actual') total += hist[i] || 0; else if (mode === 'forecast') total += fore[i] || 0; else total += (hist[i] > 0 ? hist[i] : fore[i]); } return total; } var h=''; function rg(g){ accounts.filter(function(a){return a.group===g}).forEach(function(acc){ var baseActual = sumPeriod(acc, baseYear, startMi, endMi, 'actual'); var baseForecast = sumPeriod(acc, baseYear, startMi, endMi, 'forecast'); var diffFc = baseActual - baseForecast; var diffFcPct = baseForecast !== 0 ? (diffFc / Math.abs(baseForecast) * 100) : 0; var diffFcClass = (g === 'rev' ? (diffFc > 0 ? 'positive' : 'negative') : (diffFc < 0 ? 'positive' : 'negative')); h += '<tr><td class="comp-sticky-name">'+acc.name+'</td>'; compYears.forEach(function(cy) { var histVal = sumPeriod(acc, cy, startMi, endMi, 'combined'); var chgY = histVal !== 0 ? ((baseActual - histVal) / Math.abs(histVal) * 100) : 0; var chgYClass = (g === 'rev' ? (chgY > 0 ? 'positive' : 'negative') : (chgY < 0 ? 'positive' : 'negative')); h += '<td class="num-cell">'+fmt(histVal)+'</td>'; h += '<td class="'+chgYClass+'">'+(histVal!==0?chgY.toFixed(1)+'%':'—')+'</td>'; }); h += '<td class="num-cell" style="font-weight:700;color:var(--primary)">'+fmt(baseActual)+'</td>'; h += '<td class="num-cell" style="color:var(--purple)">'+fmt(baseForecast)+'</td>'; h += '<td class="'+diffFcClass+'">'+fmt(diffFc)+' ('+diffFcPct.toFixed(1)+'%)</td>'; h += '</tr>'; }); } ['rev','cogs','opex_other','marketing','admin'].forEach(rg); function calcNet(year, mode) { return accounts.reduce(function(s, acc) { var val = sumPeriod(acc, year, startMi, endMi, mode); if(acc.group==='rev') return s + val; if(['cogs','opex_other','marketing','admin'].indexOf(acc.group)!==-1) return s - val; return s; }, 0); } var nActual = calcNet(baseYear, 'actual'); var nForecast = calcNet(baseYear, 'forecast'); var nDiffFc = nActual - nForecast; var nDiffFcPct = nForecast !== 0 ? (nDiffFc / Math.abs(nForecast) * 100) : 0; var nDiffFcClass = nDiffFc > 0 ? 'positive' : 'negative'; h += '<tr style="background:var(--success-light);font-weight:800;border-top:3px solid var(--success)">'; h += '<td class="comp-sticky-name" style="background:var(--success-light)">صافي الربح</td>'; compYears.forEach(function(cy) { var nHist = calcNet(cy, 'combined'); var nChgY = nHist !== 0 ? ((nActual - nHist) / Math.abs(nHist) * 100) : 0; var nChgYClass = nChgY > 0 ? 'positive' : 'negative'; h += '<td class="num-cell">'+fmt(nHist)+'</td>'; h += '<td class="'+nChgYClass+'">'+(nHist!==0?nChgY.toFixed(1)+'%':'—')+'</td>'; }); h += '<td style="color:var(--primary)" class="num-cell">'+fmt(nActual)+'</td>'; h += '<td style="color:var(--purple)" class="num-cell">'+fmt(nForecast)+'</td>'; h += '<td class="'+nDiffFcClass+'">'+fmt(nDiffFc)+' ('+nDiffFcPct.toFixed(1)+'%)</td>'; h += '</tr>'; document.getElementById('compBody').innerHTML=h; }
+
+/* ✅ دالة معدلة: تقبل نطاق أشهر */
+function getMixedYearData(year, startMi, endMi) {
+    if(startMi === undefined) startMi = 0;
+    if(endMi === undefined) endMi = 11;
+    var d = {rev:0, cogs:0, opex_other:0, marketing:0, admin:0};
+    accounts.forEach(function(a){
+        var hist = a.hist['y'+year] || Array(12).fill(0);
+        var fore = (a.forecast && a.forecast['y'+year]) ? a.forecast['y'+year] : Array(12).fill(0);
+        var total = 0;
+        for(var i=startMi; i<=endMi; i++) {
+            total += (hist[i] > 0 ? hist[i] : fore[i]);
+        }
+        if(a.group==='rev') d.rev += total;
+        else if(a.group==='cogs') d.cogs += total;
+        else if(a.group==='opex_other') d.opex_other += total;
+        else if(a.group==='marketing') d.marketing += total;
+        else if(a.group==='admin') d.admin += total;
+    });
+    d.gross = d.rev - d.cogs;
+    d.opexmkt = d.opex_other + d.marketing;
+    d.net = d.gross - d.opexmkt - d.admin;
+    return d;
+}
+
+/* ✅ دالة معدلة بالكامل: تقرأ الفترة والسنوات من عناصر التحكم */
+function updateChartsAndRatios(){
+    var startMi = parseInt(document.getElementById('analysis-start-month').value) || 0;
+    var endMi = parseInt(document.getElementById('analysis-end-month').value) || 11;
     if(startMi > endMi) { var temp = startMi; startMi = endMi; endMi = temp; }
+    var baseYear = parseInt(document.getElementById('analysis-base-year').value) || targetYear;
 
     var compYears = [];
-    ['comp-hist-year1', 'comp-hist-year2', 'comp-hist-year3'].forEach(function(id) {
+    ['analysis-hist-year1', 'analysis-hist-year2'].forEach(function(id) {
         var val = document.getElementById(id).value;
         if(val && parseInt(val) !== baseYear) compYears.push(parseInt(val));
     });
+    compYears.sort(function(a,b){return a-b});
 
-    var periodLabel = ' ('+monthsAr[startMi]+' - '+monthsAr[endMi]+')';
-    
-    // Build Table Head dynamically
-    var thead = '<tr><th class="comp-sticky-name">البيان</th>';
-    compYears.forEach(function(cy) {
-        thead += '<th>'+cy+periodLabel+'</th><th style="background:#4b5563">التغير عن '+cy+'</th>';
-    });
-    thead += '<th>'+baseYear+' (فعلي)</th><th style="background:var(--purple)">'+baseYear+' (تنبؤ)</th><th style="background:#374151">انحراف التنبؤ</th></tr>';
-    document.getElementById('comp-table-head').innerHTML = thead;
+    var labelEl = document.getElementById('analysis-year-label');
+    if(labelEl) labelEl.innerText = '('+baseYear+' | '+monthsAr[startMi]+' - '+monthsAr[endMi]+')';
 
-    function sumPeriod(acc, year, start, end, mode) {
-        var total = 0;
-        var hist = acc.hist['y'+year] || Array(12).fill(0);
-        var fore = (acc.forecast && acc.forecast['y'+year]) ? acc.forecast['y'+year] : Array(12).fill(0);
-        for(var i=start; i<=end; i++) {
-            if (mode === 'actual') total += hist[i] || 0;
-            else if (mode === 'forecast') total += fore[i] || 0;
-            else total += (hist[i] > 0 ? hist[i] : fore[i]);
-        }
-        return total;
-    }
+    var periodLabel = monthsAr[startMi]+' - '+monthsAr[endMi];
 
-    var h='';
-    function rg(g){
-        accounts.filter(function(a){return a.group===g}).forEach(function(acc){
-            var baseActual = sumPeriod(acc, baseYear, startMi, endMi, 'actual');
-            var baseForecast = sumPeriod(acc, baseYear, startMi, endMi, 'forecast');
-            var diffFc = baseActual - baseForecast;
-            var diffFcPct = baseForecast !== 0 ? (diffFc / Math.abs(baseForecast) * 100) : 0;
-            var diffFcClass = (g === 'rev' ? (diffFc > 0 ? 'positive' : 'negative') : (diffFc < 0 ? 'positive' : 'negative'));
+    /* بناء بيانات كل السنوات */
+    var allYears = compYears.concat([baseYear]).sort(function(a,b){return a-b});
+    var allData = {};
+    allYears.forEach(function(y){ allData[y] = getMixedYearData(y, startMi, endMi); });
 
-            h += '<tr><td class="comp-sticky-name">'+acc.name+'</td>';
-            
-            compYears.forEach(function(cy) {
-                var histVal = sumPeriod(acc, cy, startMi, endMi, 'combined');
-                var chgY = histVal !== 0 ? ((baseActual - histVal) / Math.abs(histVal) * 100) : 0;
-                var chgYClass = (g === 'rev' ? (chgY > 0 ? 'positive' : 'negative') : (chgY < 0 ? 'positive' : 'negative'));
+    var labels = allYears.map(String);
+    var revData = allYears.map(function(y){return allData[y].rev});
+    var netData = allYears.map(function(y){return allData[y].net});
 
-                h += '<td class="num-cell">'+fmt(histVal)+'</td>';
-                h += '<td class="'+chgYClass+'">'+(histVal!==0?chgY.toFixed(1)+'%':'—')+'</td>';
-            });
-
-            h += '<td class="num-cell" style="font-weight:700;color:var(--primary)">'+fmt(baseActual)+'</td>';
-            h += '<td class="num-cell" style="color:var(--purple)">'+fmt(baseForecast)+'</td>';
-            h += '<td class="'+diffFcClass+'">'+fmt(diffFc)+' ('+diffFcPct.toFixed(1)+'%)</td>';
-            h += '</tr>';
-        });
-    }
-    
-    ['rev','cogs','opex_other','marketing','admin'].forEach(rg);
-    
-    function calcNet(year, mode) {
-        return accounts.reduce(function(s, acc) {
-            var val = sumPeriod(acc, year, startMi, endMi, mode);
-            if(acc.group==='rev') return s + val;
-            if(['cogs','opex_other','marketing','admin'].indexOf(acc.group)!==-1) return s - val;
-            return s;
-        }, 0);
-    }
-
-    var nActual = calcNet(baseYear, 'actual');
-    var nForecast = calcNet(baseYear, 'forecast');
-    var nDiffFc = nActual - nForecast;
-    var nDiffFcPct = nForecast !== 0 ? (nDiffFc / Math.abs(nForecast) * 100) : 0;
-    var nDiffFcClass = nDiffFc > 0 ? 'positive' : 'negative';
-
-    h += '<tr style="background:var(--success-light);font-weight:800;border-top:3px solid var(--success)">';
-    h += '<td class="comp-sticky-name" style="background:var(--success-light)">صافي الربح</td>';
-    
-    compYears.forEach(function(cy) {
-        var nHist = calcNet(cy, 'combined');
-        var nChgY = nHist !== 0 ? ((nActual - nHist) / Math.abs(nHist) * 100) : 0;
-        var nChgYClass = nChgY > 0 ? 'positive' : 'negative';
-        h += '<td class="num-cell">'+fmt(nHist)+'</td>';
-        h += '<td class="'+nChgYClass+'">'+(nHist!==0?nChgY.toFixed(1)+'%':'—')+'</td>';
+    /* رسم بياني 1: الإيرادات وصافي الربح */
+    var c1=document.getElementById('trendChart').getContext('2d');
+    if(trendChartInstance) trendChartInstance.destroy();
+    trendChartInstance=new Chart(c1,{
+        type:'line',
+        data:{
+            labels:labels,
+            datasets:[
+                {label:'الإيرادات ('+periodLabel+')',data:revData,borderColor:'#4f46e5',backgroundColor:'#eef2ff',fill:true,borderWidth:3,tension:0.3},
+                {label:'صافي الربح ('+periodLabel+')',data:netData,borderColor:'#10b981',backgroundColor:'#ecfdf5',fill:true,borderWidth:3,tension:0.3}
+            ]
+        },
+        options:{responsive:true,plugins:{legend:{position:'top'}},scales:{y:{ticks:{callback:function(v){return (v/1000).toFixed(0)+'k'}}}}}
     });
 
-    h += '<td style="color:var(--primary)" class="num-cell">'+fmt(nActual)+'</td>';
-    h += '<td style="color:var(--purple)" class="num-cell">'+fmt(nForecast)+'</td>';
-    h += '<td class="'+nDiffFcClass+'">'+fmt(nDiffFc)+' ('+nDiffFcPct.toFixed(1)+'%)</td>';
-    h += '</tr>';
+    /* رسم بياني 2: هيكل التكاليف */
+    var cogsData = allYears.map(function(y){return allData[y].cogs});
+    var opexData = allYears.map(function(y){return allData[y].opex_other});
+    var mktData = allYears.map(function(y){return allData[y].marketing});
+    var adminData = allYears.map(function(y){return allData[y].admin});
+    var netBarData = allYears.map(function(y){return allData[y].net});
 
-    document.getElementById('compBody').innerHTML=h;
+    var c2=document.getElementById('breakdownChart').getContext('2d');
+    if(breakdownChartInstance) breakdownChartInstance.destroy();
+    breakdownChartInstance=new Chart(c2,{
+        type:'bar',
+        data:{
+            labels:labels,
+            datasets:[
+                {label:'بضاعة',data:cogsData,backgroundColor:'#ef4444'},
+                {label:'تشغيلية أخري',data:opexData,backgroundColor:'#f59e0b'},
+                {label:'تسويقية',data:mktData,backgroundColor:'#6366f1'},
+                {label:'إدارية',data:adminData,backgroundColor:'#3b82f6'},
+                {label:'صافي ربح',data:netBarData,backgroundColor:'#10b981'}
+            ]
+        },
+        options:{responsive:true,scales:{x:{stacked:true},y:{stacked:true,ticks:{callback:function(v){return (v/1000).toFixed(0)+'k'}}}},plugins:{legend:{position:'top'}}}
+    });
+
+    /* النسب المالية */
+    function cr(n,d){return d===0?'0%':(n/d*100).toFixed(1)+'%'}
+
+    var ratiosHtml = '';
+
+    /* هامش مجمل الربح */
+    ratiosHtml += '<div class="ratio-card"><h4>هامش مجمل الربح</h4><div class="ratio-values">';
+    allYears.forEach(function(y){
+        var isBase = (y === baseYear);
+        ratiosHtml += '<div class="ratio-year'+(isBase?' highlight':'')+'"><label>'+y+'</label><span>'+cr(allData[y].gross, allData[y].rev)+'</span></div>';
+    });
+    ratiosHtml += '</div></div>';
+
+    /* هامش صافي الربح */
+    ratiosHtml += '<div class="ratio-card"><h4>هامش صافي الربح</h4><div class="ratio-values">';
+    allYears.forEach(function(y){
+        var isBase = (y === baseYear);
+        ratiosHtml += '<div class="ratio-year'+(isBase?' highlight':'')+'"><label>'+y+'</label><span>'+cr(allData[y].net, allData[y].rev)+'</span></div>';
+    });
+    ratiosHtml += '</div></div>';
+
+    /* نسبة تكلفة البضاعة */
+    ratiosHtml += '<div class="ratio-card"><h4>نسبة تكلفة البضاعة</h4><div class="ratio-values">';
+    allYears.forEach(function(y){
+        var isBase = (y === baseYear);
+        ratiosHtml += '<div class="ratio-year'+(isBase?' highlight':'')+'"><label>'+y+'</label><span>'+cr(allData[y].cogs, allData[y].rev)+'</span></div>';
+    });
+    ratiosHtml += '</div></div>';
+
+    /* نسبة التكاليف التسويقية */
+    ratiosHtml += '<div class="ratio-card"><h4>نسبة التكاليف التسويقية</h4><div class="ratio-values">';
+    allYears.forEach(function(y){
+        var isBase = (y === baseYear);
+        ratiosHtml += '<div class="ratio-year'+(isBase?' highlight':'')+'"><label>'+y+'</label><span>'+cr(allData[y].marketing, allData[y].rev)+'</span></div>';
+    });
+    ratiosHtml += '</div></div>';
+
+    /* نسبة التكاليف الإدارية */
+    ratiosHtml += '<div class="ratio-card"><h4>نسبة التكاليف الإدارية</h4><div class="ratio-values">';
+    allYears.forEach(function(y){
+        var isBase = (y === baseYear);
+        ratiosHtml += '<div class="ratio-year'+(isBase?' highlight':'')+'"><label>'+y+'</label><span>'+cr(allData[y].admin, allData[y].rev)+'</span></div>';
+    });
+    ratiosHtml += '</div></div>';
+
+    /* نسبة التكاليف التشغيلية */
+    ratiosHtml += '<div class="ratio-card"><h4>نسبة التكاليف التشغيلية</h4><div class="ratio-values">';
+    allYears.forEach(function(y){
+        var isBase = (y === baseYear);
+        ratiosHtml += '<div class="ratio-year'+(isBase?' highlight':'')+'"><label>'+y+'</label><span>'+cr(allData[y].opex_other, allData[y].rev)+'</span></div>';
+    });
+    ratiosHtml += '</div></div>';
+
+    document.getElementById('ratiosGrid').innerHTML = ratiosHtml;
 }
 
-function getYA(y){var d={rev:0,cogs:0,opex_other:0,marketing:0,admin:0};accounts.forEach(function(a){var v=a.hist['y'+y]?a.hist['y'+y].reduce(function(x,b){return x+(b||0)},0):0;if(a.group==='rev')d.rev+=v;else if(a.group==='cogs')d.cogs+=v;else if(a.group==='opex_other')d.opex_other+=v;else if(a.group==='marketing')d.marketing+=v;else if(a.group==='admin')d.admin+=v});d.gross=d.rev-d.cogs;d.opexmkt=d.opex_other+d.marketing;d.net=d.gross-d.opexmkt-d.admin;return d}
+/* ✅ دالة جديدة: تحديث التحليل عند تغيير أي فلتر */
+window.updateAnalysis = function(){ updateChartsAndRatios(); };
 
-function updateChartsAndRatios(){ calculateTotals();var d1=getYA(targetYear-2),d2=getYA(targetYear-1); var d3={rev:parseNum(document.getElementById('total_rev_sum').innerText),cogs:parseNum(document.getElementById('total_cogs_sum').innerText),opex_other:parseNum(document.getElementById('total_opex_other_sum').innerText),marketing:parseNum(document.getElementById('total_marketing_sum').innerText),opexmkt:parseNum(document.getElementById('total_opexmkt_sum').innerText),admin:parseNum(document.getElementById('total_admin_sum').innerText),gross:parseNum(document.getElementById('gross_sum').innerText),net:parseNum(document.getElementById('net_sum').innerText)}; var c1=document.getElementById('trendChart').getContext('2d');if(trendChartInstance)trendChartInstance.destroy(); trendChartInstance=new Chart(c1,{type:'line',data:{labels:[targetYear-2+'',targetYear-1+'',targetYear+''],datasets:[{label:'الإيرادات',data:[d1.rev,d2.rev,d3.rev],borderColor:'#4f46e5',backgroundColor:'#eef2ff',fill:true,borderWidth:3},{label:'صافي الربح',data:[d1.net,d2.net,d3.net],borderColor:'#10b981',backgroundColor:'#ecfdf5',fill:true,borderWidth:3}]},options:{responsive:true}}); var c2=document.getElementById('breakdownChart').getContext('2d');if(breakdownChartInstance)breakdownChartInstance.destroy(); breakdownChartInstance=new Chart(c2,{type:'bar',data:{labels:[targetYear-2+'',targetYear-1+'',targetYear+''],datasets:[{label:'بضاعة',data:[d1.cogs,d2.cogs,d3.cogs],backgroundColor:'#ef4444'},{label:'تشغيلية أخري',data:[d1.opex_other,d2.opex_other,d3.opex_other],backgroundColor:'#f59e0b'},{label:'تسويقية',data:[d1.marketing,d2.marketing,d3.marketing],backgroundColor:'#6366f1'},{label:'إدارية',data:[d1.admin,d2.admin,d3.admin],backgroundColor:'#3b82f6'},{label:'صافي ربح',data:[d1.net,d2.net,d3.net],backgroundColor:'#10b981'}]},options:{responsive:true,scales:{x:{stacked:true},y:{stacked:true}}}}); function cr(n,d){return d===0?'0%':(n/d*100).toFixed(1)+'%'} document.getElementById('ratiosGrid').innerHTML='<div class="ratio-card"><h4>هامش مجمل الربح</h4><div class="ratio-values"><div class="ratio-year"><label>'+(targetYear-2)+'</label><span>'+cr(d1.gross,d1.rev)+'</span></div><div class="ratio-year"><label>'+(targetYear-1)+'</label><span>'+cr(d2.gross,d2.rev)+'</span></div><div class="ratio-year highlight"><label>'+targetYear+'</label><span>'+cr(d3.gross,d3.rev)+'</span></div></div></div><div class="ratio-card"><h4>هامش صافي الربح</h4><div class="ratio-values"><div class="ratio-year"><label>'+(targetYear-2)+'</label><span>'+cr(d1.net,d1.rev)+'</span></div><div class="ratio-year"><label>'+(targetYear-1)+'</label><span>'+cr(d2.net,d2.rev)+'</span></div><div class="ratio-year highlight"><label>'+targetYear+'</label><span>'+cr(d3.net,d3.rev)+'</span></div></div></div><div class="ratio-card"><h4>نسبة تكلفة البضاعة</h4><div class="ratio-values"><div class="ratio-year"><label>'+(targetYear-2)+'</label><span>'+cr(d1.cogs,d1.rev)+'</span></div><div class="ratio-year"><label>'+(targetYear-1)+'</label><span>'+cr(d2.cogs,d2.rev)+'</span></div><div class="ratio-year highlight"><label>'+targetYear+'</label><span>'+cr(d3.cogs,d3.rev)+'</span></div></div></div><div class="ratio-card"><h4>نسبة التكاليف التسويقية</h4><div class="ratio-values"><div class="ratio-year"><label>'+(targetYear-2)+'</label><span>'+cr(d1.marketing,d1.rev)+'</span></div><div class="ratio-year"><label>'+(targetYear-1)+'</label><span>'+cr(d2.marketing,d2.rev)+'</span></div><div class="ratio-year highlight"><label>'+targetYear+'</label><span>'+cr(d3.marketing,d3.rev)+'</span></div></div></div>'; }
 function parseNum(s){return parseFloat(String(s).replace(/,/g,''))||0}
 
 function buildUsersTable(){var h='',rl={admin:'مدير',editor:'محرر',viewer:'مشاهد'},rc={admin:'role-admin',editor:'role-editor',viewer:'role-viewer'};var keys=Object.keys(dbUsers);for(var k=0;k<keys.length;k++){var u=keys[k],usr=dbUsers[u],isCurr=(currentUser&&u===currentUser.username);var adminCount=0;var allKeys=Object.keys(dbUsers);for(var j=0;j<allKeys.length;j++){if(dbUsers[allKeys[j]].role==='admin')adminCount++}var isLast=(usr.role==='admin'&&adminCount<=1);h+='<tr class="'+(isCurr?'current-user-row':'')+'"><td style="font-weight:700">'+usr.name+'</td><td style="direction:ltr">'+u+'</td><td>';if(isCurr||isLast){h+='<span class="role-badge '+rc[usr.role]+'">'+rl[usr.role]+'</span>'}else{h+='<select class="role-select" onchange="window.changeUserRole(\''+u+'\',this.value)"><option value="admin"'+(usr.role==='admin'?' selected':'')+'>مدير</option><option value="editor"'+(usr.role==='editor'?' selected':'')+'>محرر</option><option value="viewer"'+(usr.role==='viewer'?' selected':'')+'>مشاهد</option></select>'}h+='</td><td><button class="btn-sm btn-password" onclick="window.openPasswordModal(\''+u+'\',\''+usr.name+'\')">🔑 كلمة المرور</button>';if(!isCurr&&!isLast)h+=' <button class="btn-sm btn-remove" onclick="window.deleteUser(\''+u+'\')">🗑️ حذف</button>';h+='</td></tr>'}document.getElementById('usersBody').innerHTML=h;document.getElementById('users-count').textContent=keys.length}
