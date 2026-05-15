@@ -462,26 +462,45 @@ var useHijri = (typeof moment !== 'undefined' && typeof moment().iMonth === 'fun
 function getHijriOverlap(gYear, gMonth0) { if (!useHijri) return {}; var daysInMonth = new Date(gYear, gMonth0 + 1, 0).getDate(); var overlap = {}; for (var d = 1; d <= daysInMonth; d++) { var dateStr = gYear + '-' + String(gMonth0+1).padStart(2,'0') + '-' + String(d).padStart(2,'0'); try { var hijriMonth = moment(dateStr, 'YYYY-MM-DD').iMonth(); overlap[hijriMonth] = (overlap[hijriMonth] || 0) + 1; } catch(e) { return {}; } } return overlap; }
 function getDominantHijriMonth(gYear, gMonth0) { var overlap = getHijriOverlap(gYear, gMonth0); var maxDays = 0, dominantMonth = -1; for (var h in overlap) { if (overlap[h] > maxDays) { maxDays = overlap[h]; dominantMonth = parseInt(h); } } return dominantMonth; }
 function updateMonthHeaders() { 
-    var headerCells = document.querySelectorAll('#forecast-month-headers .header-forecast'); 
-    if(headerCells.length === 0) return; 
-    headerCells.forEach(function(cell, index) { 
-        var mi = index; 
-        var dominant = getDominantHijriMonth(targetYear, mi); 
-        var hijriName = getHijriMonthName(dominant) || ''; 
-        var icon = ''; 
-        var style = 'font-size:11px; font-weight:400; color:#c7d2fe; display:block; margin-top:2px;'; 
+    var row = document.getElementById('forecast-month-headers');
+    if(!row) return;
+
+    // بناء الصف برمجياً من الصفر لضمان ظهور كل شيء
+    var html = '<th class="forecast-sticky-name">'+t('month')+'</th>';
+    
+    for(var mi=0; mi<12; mi++) {
+        var dominant = -1;
+        var hijriName = '';
         
-        // ✅ الاعتماد على اسم الشهر لضمان ظهور الأيقونات (رمضان، شوال، الحج)
+        // التأكد من أن مكتبة الهجري تعمل قبل حساب الأشهر
+        if (typeof getDominantHijriMonth === 'function' && useHijri) {
+            dominant = getDominantHijriMonth(targetYear, mi);
+            if(dominant !== -1) hijriName = getHijriMonthName(dominant);
+        }
+        
+        var icon = ''; 
+        var style = 'font-size:11px; font-weight:400; color:#c7d2fe; display:block; margin-top:2px; line-height:1.4;'; 
+        
+        // ✅ الاعتماد على الاسم لوضع الأيقونات
         if (hijriName.includes('رمضان') || hijriName.includes('Ramadan')) { 
             icon = ' 🌙'; style += 'color:#fcd34d; font-weight:700;'; 
         } else if (hijriName.includes('شوال') || hijriName.includes('Shawwal')) { 
             icon = ' 🎉'; style += 'color:#a7f3d0;'; 
         } else if (hijriName.includes('الحجة') || hijriName.includes('Hijjah')) { 
-            icon = ' 🕋'; style += 'color:#fcd34d; font-weight:700;'; // لون أصفر بارز على الخلفية البنفسجية
+            icon = ' 🕋'; style += 'color:#fcd34d; font-weight:700; font-size:14px;'; // أيقونة كبيرة وبارزة
         }
 
-        cell.innerHTML = getMonthName(mi) + '<span style="' + style + '">' + hijriName + icon + '</span>'; 
-    }); 
+        html += '<th class="header-forecast">' + getMonthName(mi); 
+        if(hijriName) {
+            html += '<span style="' + style + '">' + hijriName + icon + '</span>';
+        }
+        html += '</th>';
+    }
+    
+    html += '<th class="forecast-sticky-total">'+t('total')+'</th>';
+    
+    // إدراج الصف كاملاً في الجدول
+    row.innerHTML = html;
 }
 function getHijriDailyAverages(acc) { if (!useHijri) return Array(12).fill(0); var hijriTotals = Array(12).fill(0); var hijriDays = Array(12).fill(0); var histYears = Object.keys(acc.hist).filter(function(k) { return k.startsWith('y') && Array.isArray(acc.hist[k]) }).map(function(k) { return parseInt(k.replace('y', '')) }).filter(function(y) { return y < targetYear }); histYears.forEach(function(y) { var data = acc.hist['y'+y]; if (!data) return; for (var m = 0; m < 12; m++) { if (data[m] === 0) continue; var overlap = getHijriOverlap(y, m); var daysInMonth = new Date(y, m+1, 0).getDate(); var dailyValue = data[m] / daysInMonth; for (var hMonth in overlap) { hijriTotals[parseInt(hMonth)] += dailyValue * overlap[hMonth]; hijriDays[parseInt(hMonth)] += overlap[hMonth]; } } }); var averages = Array(12).fill(0); var overallAvgDaily = 0, totalDays = 0, totalSum = 0; histYears.forEach(function(y) { var data = acc.hist['y'+y]; if(data) { for(var m=0; m<12; m++) { totalSum += data[m]; totalDays += new Date(y, m+1, 0).getDate(); } } }); if (totalDays > 0) overallAvgDaily = totalSum / totalDays; for (var i = 0; i < 12; i++) { averages[i] = hijriDays[i] > 0 ? (hijriTotals[i] / hijriDays[i]) : overallAvgDaily; } return averages; }
 
