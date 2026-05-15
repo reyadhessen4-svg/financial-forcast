@@ -460,7 +460,18 @@ var accounts=null;
 
 var useHijri = (typeof moment !== 'undefined' && typeof moment().iMonth === 'function');
 function getHijriOverlap(gYear, gMonth0) { if (!useHijri) return {}; var daysInMonth = new Date(gYear, gMonth0 + 1, 0).getDate(); var overlap = {}; for (var d = 1; d <= daysInMonth; d++) { var dateStr = gYear + '-' + String(gMonth0+1).padStart(2,'0') + '-' + String(d).padStart(2,'0'); try { var hijriMonth = moment(dateStr, 'YYYY-MM-DD').iMonth(); overlap[hijriMonth] = (overlap[hijriMonth] || 0) + 1; } catch(e) { return {}; } } return overlap; }
-function getDominantHijriMonth(gYear, gMonth0) { var overlap = getHijriOverlap(gYear, gMonth0); var maxDays = 0, dominantMonth = -1; for (var h in overlap) { if (overlap[h] > maxDays) { maxDays = overlap[h]; dominantMonth = parseInt(h); } } return dominantMonth; }
+function getDominantHijriMonth(gYear, gMonth0) { 
+    var overlap = getHijriOverlap(gYear, gMonth0); 
+    var maxDays = 0, dominantMonth = -1; 
+    for (var h in overlap) { 
+        // ✅ التعديل هنا: استخدام >= بدلاً من > لضمان عدم اختفاء الشهر الهجري إذا تساوت الأيام
+        if (overlap[h] >= maxDays) { 
+            maxDays = overlap[h]; 
+            dominantMonth = parseInt(h); 
+        } 
+    } 
+    return dominantMonth; 
+}
 function updateMonthHeaders() { 
     var headerCells = document.querySelectorAll('#forecast-month-headers .header-forecast'); 
     if(headerCells.length === 0) return; 
