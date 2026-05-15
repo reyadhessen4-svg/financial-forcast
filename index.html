@@ -201,7 +201,11 @@ html[dir="ltr"] .comp-sticky-name{left:0;text-align:left;border-right:2px solid 
 <button class="scroll-nav-btn" onclick="window.jumpToSection('section-net')" data-i18n="navNet">صافي الربح</button>
 </div>
 <div class="table-container" id="forecast-table-container">
-<table id="forecast-table"><thead><tr><th class="forecast-sticky-name" data-i18n="statement">البيان</th><th colspan="12" class="header-forecast" id="forecast-header-year">التنبؤ 2026</th><th class="forecast-sticky-total" data-i18n="total">الإجمالي</th></tr><tr id="forecast-month-headers"><th class="forecast-sticky-name" data-i18n="month">الشهر</th></tr></thead><tbody id="forecastBody"></tbody></table>
+<table id="forecast-table"><thead><tr><th class="forecast-sticky-name" data-i18n="statement">البيان</th><th colspan="12" class="header-forecast" id="forecast-header-year">التنبؤ 2026</th><th class="forecast-sticky-total" data-i18n="total">الإجمالي</th></tr><tr id="forecast-month-headers">
+    <th class="forecast-sticky-name" data-i18n="month">الشهر</th>
+    <th class="header-forecast"></th><th class="header-forecast"></th><th class="header-forecast"></th><th class="header-forecast"></th><th class="header-forecast"></th><th class="header-forecast"></th><th class="header-forecast"></th><th class="header-forecast"></th><th class="header-forecast"></th><th class="header-forecast"></th><th class="header-forecast"></th><th class="header-forecast"></th>
+    <th class="forecast-sticky-total" data-i18n="total">الإجمالي</th>
+</tr></thead><tbody id="forecastBody"></tbody></table>
 </div>
 </div>
 
@@ -245,7 +249,13 @@ html[dir="ltr"] .comp-sticky-name{left:0;text-align:left;border-right:2px solid 
 <button class="btn btn-add" onclick="window.addItem()" data-i18n="addBtn">+ إضافة</button>
 </div>
 <div class="table-container">
-<table id="hist-table"><thead><tr><th class="hist-sticky-1" data-i18n="action">إجراء</th><th class="hist-sticky-2" data-i18n="statement">البيان</th><th class="hist-sticky-3" data-i18n="year">السنة</th></tr></thead><tbody id="histBody"></tbody></table>
+<table id="hist-table"><thead><tr>
+    <th class="hist-sticky-1" data-i18n="action">إجراء</th>
+    <th class="hist-sticky-2" data-i18n="statement">البيان</th>
+    <th class="hist-sticky-3" data-i18n="year">السنة</th>
+    <th class="hist-month-th"></th><th class="hist-month-th"></th><th class="hist-month-th"></th><th class="hist-month-th"></th><th class="hist-month-th"></th><th class="hist-month-th"></th><th class="hist-month-th"></th><th class="hist-month-th"></th><th class="hist-month-th"></th><th class="hist-month-th"></th><th class="hist-month-th"></th><th class="hist-month-th"></th>
+    <th style="background:var(--gray-600)" data-i18n="total">الإجمالي</th>
+</tr></thead><tbody id="histBody"></tbody></table>
 </div>
 </div>
 
@@ -404,15 +414,19 @@ function applyLanguage() {
     document.documentElement.lang = currentLang;
     document.documentElement.dir = t('dir');
     
+    // تحديث النصوص العادية
     document.querySelectorAll('[data-i18n]').forEach(function(el) {
         var key = el.getAttribute('data-i18n');
         if (t(key)) el.textContent = t(key);
     });
+    
+    // تحديث النصوص داخل الحقول (Placeholder)
     document.querySelectorAll('[data-i18n-placeholder]').forEach(function(el) {
         var key = el.getAttribute('data-i18n-placeholder');
         if (t(key)) el.placeholder = t(key);
     });
     
+    // تحديث حالة المزامنة
     var syncEl = document.getElementById('sync-status');
     if(syncEl) {
         var cls = syncEl.className;
@@ -421,6 +435,9 @@ function applyLanguage() {
         else if(cls.includes('sync-saving')) syncEl.innerText = t('savingSync');
         else if(cls.includes('sync-error')) syncEl.innerText = t('errorSync');
     }
+
+    // ✅ تحديث أسماء الشهور في جدول التاريخ عند تغيير اللغة
+    updateHistMonthHeaders();
 }
 
 // Overwrite static arrays with language-dependent functions
@@ -507,7 +524,11 @@ function formatInput(el){el.value=el.value.replace(/[^0-9]/g,'')}
 window.saveActualValue=async function(accId,mi,value){if(!canDo('edit_data')){showToast('No permission','error');return}var acc=accounts.find(function(a){return a.id===accId});if(acc){var yKey='y'+targetYear;if(!acc.hist[yKey])acc.hist[yKey]=Array(12).fill(0);acc.hist[yKey][mi]=parseFloat(value.replace(/,/g,''))||0;await saveAccounts();window.buildVarianceTable()}};
 function checkRollover(){var yKey='y'+targetYear;var hasDec=accounts.some(function(a){return a.hist[yKey]&&a.hist[yKey][11]>0});var sec=document.getElementById('rollover-section');if(hasDec){sec.style.display='block';document.getElementById('rollover-current-year').innerText=targetYear;document.getElementById('rollover-next-year').innerText=targetYear+1}else{sec.style.display='none'}}
 window.rollOverYear=async function(){if(!confirm('Close year '+targetYear+' and forecast '+(targetYear+1)+'?'))return;targetYear++;accounts.forEach(function(acc){if(!acc.forecast)acc.forecast={};acc.forecast['y'+targetYear]=[];for(var i=0;i<12;i++)acc.forecast['y'+targetYear].push(getForecastValue(acc,i))});await saveSettings();await saveAccounts();updateYearUI();buildAll();applyPermissions();buildMonthCheckboxes();initCompControls();initAnalysisControls();window.buildVarianceTable();showToast('Forecast generated for year '+targetYear,'success')};
-
+function updateHistMonthHeaders() {
+    document.querySelectorAll('.hist-month-th').forEach(function(el, i) {
+        el.textContent = getMonthName(i);
+    });
+}
 function buildHistTable(){ var h='',gc={rev:'row-rev',cogs:'row-cogs',opex_other:'row-opex',marketing:'row-marketing',admin:'row-admin'}; var groupNames={rev:t('g_rev'),cogs:t('g_cogs'),opex_other:t('g_opex'),marketing:t('g_mkt'),admin:t('g_admin')}; var groupOrder=['rev','cogs','opex_other','marketing','admin']; groupOrder.forEach(function(g){ h+='<tr class="row-title"><td class="hist-sticky-1" style="background:var(--gray-200)"></td><td class="hist-sticky-2" style="background:var(--gray-200);text-align:right;font-size:15px">'+groupNames[g]+'</td><td class="hist-sticky-3" style="background:var(--gray-200)"></td><td colspan="13" style="background:var(--gray-200)"></td></tr>'; accounts.filter(function(a){return a.group===g}).forEach(function(acc){ [targetYear-2, targetYear-1, targetYear].forEach(function(y){ var histData=acc.hist['y'+y];if(!histData&&y===targetYear){acc.hist['y'+y]=Array(12).fill(0);histData=acc.hist['y'+y]}if(!histData)return; var isCurrentYear=(y===targetYear);var yearLabel=y+(isCurrentYear?' ⚡'+t('actual'):''); h+='<tr class="'+gc[g]+(isCurrentYear?' row-current-actual':'')+'"><td class="hist-sticky-1">'+(!acc.isSystem?'<button class="btn btn-delete" onclick="window.deleteItem(\''+acc.id+'\')">'+t('action')+'</button>':'')+'</td><td class="hist-sticky-2">'+acc.name+'</td><td class="hist-sticky-3">'+yearLabel+'</td>'; histData.forEach(function(v,i){h+='<td><input type="text" inputmode="numeric" class="input-hist" value="'+fmt(v)+'" oninput="formatInput(this)" onchange="window.updateHist(\''+acc.id+'\',\'y'+y+'\','+i+',this.value)"></td>'}); h+='<td style="background:var(--gray-100);font-weight:800" class="num-cell">'+fmt(histData.reduce(function(a,b){return a+b},0))+'</td></tr>'; })})}); document.getElementById('histBody').innerHTML=h; }
 window.updateHist=async function(id,yk,i,v){if(!canDo('edit_data'))return;var a=accounts.find(function(x){return x.id===id});if(a){a.hist[yk][i]=parseFloat(v.replace(/,/g,''))||0;await saveAccounts();buildHistTable();applyPermissions()}};
 
