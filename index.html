@@ -210,7 +210,10 @@ html[dir="ltr"] .comp-sticky-name{left:0;text-align:left;border-right:2px solid 
 </div>
 
 <div id="tab6" class="tab-content">
-<h2 data-i18n="tab6Title">📋 متابعة الأداء الفعلي مقابل التنبؤ <button class="btn-excel" onclick="window.exportExcel('variance')">📥 <span data-i18n="exportExcel">تصدير إكسيل</span></button></h2>
+<h2>
+    <span data-i18n="tab6Title">📋 متابعة الأداء الفعلي مقابل التنبؤ</span>
+    <button class="btn-excel" onclick="window.exportExcel('variance')">📥 <span data-i18n="exportExcel">تصدير إكسيل</span></button>
+</h2>
 <div class="variance-header">
 <label style="font-weight:800;font-size:15px" data-i18n="selectMonths">📅 اختر الأشهر:</label>
 <div class="month-checkboxes" id="month-checkboxes"></div>
@@ -235,11 +238,14 @@ html[dir="ltr"] .comp-sticky-name{left:0;text-align:left;border-right:2px solid 
 </div>
 
 <div id="tab2" class="tab-content">
-<h2 data-i18n="tab2Title">البيانات التاريخية الفعلية 
-<button class="btn-excel" onclick="window.exportExcel('hist')">📥 <span data-i18n="exportExcel">تصدير إكسيل</span></button> 
-<button class="btn-doc" onclick="window.downloadTemplate()">📄 <span data-i18n="downloadTemplate">تحميل القالب</span></button> 
-<button class="btn-import" onclick="window.triggerImportExcel()">📤 <span data-i18n="importExcel">استيراد إكسيل</span></button> 
-<button class="btn-reset" onclick="window.resetData()">🗑️ <span data-i18n="fullReset">إعادة ضبط</span></button>
+<h2>
+    <span data-i18n="tab2Title">البيانات التاريخية الفعلية</span>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+        <button class="btn-excel" onclick="window.exportExcel('hist')">📥 <span data-i18n="exportExcel">تصدير إكسيل</span></button> 
+        <button class="btn-doc" onclick="window.downloadTemplate()">📄 <span data-i18n="downloadTemplate">تحميل القالب</span></button> 
+        <button class="btn-import" onclick="window.triggerImportExcel()">📤 <span data-i18n="importExcel">استيراد إكسيل</span></button> 
+        <button class="btn-reset" onclick="window.resetData()">🗑️ <span data-i18n="fullReset">إعادة ضبط</span></button>
+    </div>
 </h2>
 <div class="add-form" id="add-form-ui">
 <label style="font-weight:700" data-i18n="addItem">إضافة بند:</label>
@@ -260,7 +266,10 @@ html[dir="ltr"] .comp-sticky-name{left:0;text-align:left;border-right:2px solid 
 </div>
 
 <div id="tab3" class="tab-content">
-<h2 data-i18n="tab3Title">المقارنة السنوية والفترية <button class="btn-excel" onclick="window.exportExcel('comp')">📥 <span data-i18n="exportExcel">تصدير إكسيل</span></button></h2>
+<h2>
+    <span data-i18n="tab3Title">المقارنة السنوية والفترية</span>
+    <button class="btn-excel" onclick="window.exportExcel('comp')">📥 <span data-i18n="exportExcel">تصدير إكسيل</span></button>
+</h2>
 <div class="comp-controls">
     <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
         <label data-i18n="period">📅 الفترة:</label>
