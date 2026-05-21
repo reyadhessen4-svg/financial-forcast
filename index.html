@@ -604,14 +604,52 @@ window.switchTab=function(tid,btn){document.querySelectorAll('.tab-content').for
 function buildAll(){buildForecastTable();buildHistTable();updateWeightsUI()}
 
 window.downloadTemplate=function(){
-    if(typeof XLSX==='undefined'){showToast('Excel library not loaded','error');return}
-    var headers=[t('statement'),t('role'),t('wSeasonal'),t('year'),getMonthName(0),getMonthName(1),getMonthName(2),getMonthName(3),getMonthName(4),getMonthName(5),getMonthName(6),getMonthName(7),getMonthName(8),getMonthName(9),getMonthName(10),getMonthName(11)];
-    var ws=XLSX.utils.aoa_to_sheet([headers]);
-    ws['!cols']=[{wch:22},{wch:14},{wch:14},{wch:8},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14}];
+    if(typeof XLSX==='undefined'){showToast('مكتبة Excel غير محملة','error');return}
+    
+    // رأس الجدول
+    var headers=['اسم البند','المجموعة','نوع التنبؤ','السنة','يناير','فبراير','مارس','أبريل','مايو','يونيو','يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'];
+    var dataRows=[headers];
+    
+    // ترجمة المجموعات والأنواع لتكون بالعربي في الإكسيل (لتتطابق مع دالة الاستيراد)
+    var groupMapAr={rev:'إيرادات',cogs:'تكلفة بضاعة',opex_other:'تشغيلية أخري',marketing:'تسويقية',admin:'إدارية'};
+    var typeMapAr={seasonal:'موسمي',fixed:'ثابت'};
+    
+    // إنشاء صفوف لكل بند ولكل سنة (2024، 2025، 2026)
+    accounts.forEach(function(acc){
+        [2024, 2025, 2026].forEach(function(year){
+            var histData = acc.hist['y'+year] || Array(12).fill(0);
+            var row = [
+                acc.name,
+                groupMapAr[acc.group] || acc.group,
+                typeMapAr[acc.forecastType] || acc.forecastType,
+                year
+            ];
+            
+            for(var m=0; m<12; m++){
+                // لسنة 2026: نضع البيانات الفعلية إن وجدت (لأول 4 أشهر)، وباقي الشهر نتركها فارغة لتملأها
+                if(year === 2026 && m >= 4 && histData[m] === 0) {
+                    row.push(''); // خلية فارغة
+                } else {
+                    row.push(histData[m] || 0); // القيمة أو صفر
+                }
+            }
+            
+            dataRows.push(row);
+        });
+    });
+
+    var ws=XLSX.utils.aoa_to_sheet(dataRows);
+    
+    // تنسيق عرض الأعمدة لتكون مريحة للقراءة
+    ws['!cols']=[
+        {wch:25},{wch:18},{wch:15},{wch:8}, // أول 4 أعمدة
+        {wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14} // أشهر السنة
+    ];
+    
     var wb=XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb,ws,t('tab2'));
-    XLSX.writeFile(wb,t('downloadTemplate')+'.xlsx');
-    showToast('Template downloaded','info');
+    XLSX.utils.book_append_sheet(wb,ws,'البيانات التاريخية');
+    XLSX.writeFile(wb,'قالب_البيانات_التاريخية.xlsx');
+    showToast('تم تحميل القالب بالبيانات الحالية - عدل الأرقام واملأ 2026 ثم ارفعه','info');
 };
 
 window.triggerImportExcel=function(){
